@@ -33,6 +33,35 @@
 	using namespace std;
 	int main()
 	{
+		CSA csa("filename");
+		int num;
+		csa.Counting(pattern,num);
+		cout<<"pattern "<<pattern<<" occs "<<num<<" times"<<endl;
+
+		int *pos;
+		csa.Locating(pattern,num,pos);
+		cout<<"pattern "<<pattern<<" occs "<<num<<" times"<<endl;
+		cout<<"all positions are:"<<endl;
+		for(int i=0;i<num;i++)
+			cout<<pos[i]<<endl;
+		delete [] pos;
+		pos=NULL;
+
+		char * sequence;
+		int start=0;
+		int len=20;
+		csa.Extracting(start,len,sequence);
+		cout<<"T[start...start+len-1] is "<<sequence<<endl;
+		// it's your duty to delete sequence;
+		delete [] sequence;
+		sequence =NULL;
+		
+		csa.Save("index.csa");
+		CSA csa2;
+		csa2.Load("index.csa");
+
+		return 0;
+	}
 
 	```
 ##ChangeLog
