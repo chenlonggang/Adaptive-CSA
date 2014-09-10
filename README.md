@@ -52,7 +52,7 @@
 		int len=20;
 		csa.Extracting(start,len,sequence);
 		cout<<"T[start...start+len-1] is "<<sequence<<endl;
-		// it's your duty to delete sequence;
+		//it's your duty to delete sequence;
 		delete [] sequence;
 		sequence =NULL;
 		
