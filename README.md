@@ -66,3 +66,11 @@
 
 	```
 ##ChangeLog
+	2014.9.14: Want to finsh the hybrid work in Czip, hybrid will help to make  
+	           CSA small and faster. And decoding from left or right self-adapting  
+			   may help a lot to speed,but we need to split the middle runs,
+			   this may do little harm to space, but good for speed,  
+			   that's what we need, and for Pure-Gamma-coding ,space will  
+			   not increase,that's good.This time,when decoding gamma-sequence,  
+			   don't want use the lookup tables, it do not help lot as we need,  
+			   and it does great harm to the beauty of the code.
