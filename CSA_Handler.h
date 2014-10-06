@@ -1,3 +1,16 @@
+/*============================================
+# Filename: CSA_Handler.h
+# Ver 1.0 2014-10-06
+# Copyright (C) 2014 ChenLonggang (chenlonggang.love@163.com)
+#
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 or later of the License.
+#
+# Description: 
+=============================================*/
+#ifndef CSA_Handler_H
+#define CSA_Handler_H
 class CSA_Handler
 {
 	public:
@@ -8,15 +21,16 @@ class CSA_Handler
 		~CSA_Handler();
 
 		void Counting(const char * pattern,i32 &num);
-		i32 * Locating(const char * pattern,i32 &num);
-		uchar * Extracting(i32 start,i32 len);
+		void  Locating(const char * pattern,i32 &num,i32 *& pos);
+		void Extracting(i32 start,i32 len,uchar * sequence);
 
 		i32 Save(const char * indexfile);
 		i32 Load(const char * indexfile);
 
-		double getSize();
 		i32 getAlphabetSize();
 		i32 getN();
+		i32 sizeInByte();
+		i32 sizeInByteForCount();
 	private:
 		//由位置得到该位置开始的后缀的排名
 		i32 inverse(i32 position);
@@ -58,5 +72,5 @@ class CSA_Handler
 		//operator=和拷贝构造实现浅拷贝，引用计数在这里实现
 		UseCount u;
 }
-
+#endif
 
