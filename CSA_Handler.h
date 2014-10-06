@@ -49,7 +49,7 @@ class CSA_Handler
 		void statics(uchar * T);
 		//计算出Phi数组
 		i32 * phi Phi();
-
+		void computePar(i32 * phi)
 		//分别表示:Phi超快的大小，块大小，SA采样补偿，Rank采样步长
 		i32 SL,L,D,RD;
 		//分别表示SA的采样数组和Rank的采样数组
