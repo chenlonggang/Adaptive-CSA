@@ -73,4 +73,6 @@
 			   that's what we need, and for Pure-Gamma-coding ,space will  
 			   not increase,that's good.This time,when decoding gamma-sequence,  
 			   don't want use the lookup tables, it do not help lot as we need,  
-			   and it does great harm to the beauty of the code.
+			   and it does great harm to the beauty of the code.  
+	2014.10.6: add class UseCount,Shallow Copy for operator = and copy cons for CSA  
+
