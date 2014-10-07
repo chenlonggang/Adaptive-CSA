@@ -75,4 +75,5 @@
 			   don't want use the lookup tables, it do not help lot as we need,  
 			   and it does great harm to the beauty of the code.  
 	2014.10.6: add class UseCount,Shallow Copy for operator = and copy cons for CSA  
-
+	2014.10.7: the framwork is Ok,what to do next is to make the query functions work  
+				right.
