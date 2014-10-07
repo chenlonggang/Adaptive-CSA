@@ -22,7 +22,7 @@ class CSA_Handler
 
 		void Counting(const char * pattern,i32 &num);
 		void  Locating(const char * pattern,i32 &num,i32 *& pos);
-		void Extracting(i32 start,i32 len,uchar * sequence);
+		void Extracting(i32 start,i32 len,uchar *& sequence);
 
 		i32 Save(const char * indexfile);
 		i32 Load(const char * indexfile);
@@ -37,7 +37,7 @@ class CSA_Handler
 		//得到排名位sa的后缀所属的list
 		i32 phiList(i32 sa);
 		//得到搜排名位sa的后缀的首字母
-		i32 Character(i32 sa);
+		i32 character(i32 sa);
 
 		//返回SA[sa]
 		i32 lookUp(i32 sa);
@@ -48,8 +48,12 @@ class CSA_Handler
 		uchar * Getfile(const char * filename);
 		void statics(uchar * T);
 		//计算出Phi数组
-		i32 * phi Phi();
-		void computePar(i32 * phi)
+		i32 * phi phiArray();
+		//根据gap序列中1的比例，决定threshhold。
+		void computePar(i32 * phi);
+		//采样SA and Rank
+		void sampleSAAndRank();
+		i32 blog(i32 x);
 		//分别表示:Phi超快的大小，块大小，SA采样补偿，Rank采样步长
 		i32 SL,L,D,RD;
 		//分别表示SA的采样数组和Rank的采样数组

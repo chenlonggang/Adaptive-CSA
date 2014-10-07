@@ -31,15 +31,26 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel)
 	ds_ssort(T,SA,n);
 	//计算Phi数组
 	i32 * phiarray = phiArray();
-	//计算gap中1的比例，依次决定参数 
-	computerPar(phiarray);
-
-	delete [] SA;
-	delete [] T;
-	SA=NULL;
+	
+	delete [] T;//T is useless now
 	T=NULL;
-	delete [] temp;
-	temp=NULL;
+	//计算gap中1的比例，依次决定参数 
+	//ratio暂时不决定D和RD，只决定L和SL.
+	computerPar(phiarray);
+	//采样SAL和RankL
+	sampleSAAndRank();
+	//from now on ,SA is useless;
+	delete [] SA;
+	SA=NULL;
+	//创建Phi结构。参数：
+	//phiArray:Phi数组
+	//n:Phi数组长度
+	//L:块大小，超快大小固定位块大小的18倍,不用传.
+	phi = new Phi(phiArray,n,L);
+	
+	delete [] phiarray;
+	phiarray=NULL;
+
 }
 
 void CSA_Handler::computePar(i32 * phi)
@@ -90,7 +101,20 @@ void CSA_Handler::computePar(i32 * phi)
 	this->RD=this->D*16;
 }
 
-
+void CSA_Handle::sampleSAAndRank()
+{
+	i32 i=0;
+	i32 j=0;
+	i32 step1=D;
+	i32 step2=RD;
+	SAL = new InArray(n/step1+1,blog(n));
+	RankL=new InArray(n/step2+1,blog(n));
+	for(i=0,j=0;i<n;i=i+step1,j++)
+		SAL->SetValue(j,SA[i]);
+	for(i=0;i<n;i++)
+		if(SA[i]%step2==0)
+			RankL->SetValue(SA[i]/step2,i);
+}
 
 
 i32 * CSA_Handler::phiArray()
@@ -118,6 +142,8 @@ i32 * CSA_Handler::phiArray()
 		phi[temp[code[c]]++]=i;
 	}
 	phi[index]=h;
+	delete [] temp;
+	temp=NULL;
 }
 
 
@@ -189,4 +215,82 @@ void CSA_Handler::statics(uchar *T)
 	lastchar=T[n-1];
 }
 
+void CSA_Handler::Counting(const char * pattern,i32 &num)
+{
+	i32 L=0;
+	i32 R=0;
+	countSearch(pattern,L,R);
+	num=R-L+1;
+}
+
+i32 CSA_Handler::lookUp(i32 sa)
+{
+	i32 step=0;
+	while(i%D!=0)
+	{
+		i=phi->GetValue(i);
+		step++;
+	}
+	i=i/D;
+	return (n+SAL->GetValue(i)-step)%n;
+}
+
+void CSA_Handler::Locating(const char * pattern,i32 &num,i32 *&pos)
+{
+	i32 L=0;
+	i32 R=0;
+	this->countSearch(pattern,L,R);
+	num=R-L+1;
+	if(L>R)
+		return ;
+	pos=new i32[num];
+	for(i32 i=L;i<=R;i++)
+		pos[i-L]=lookUp(i);
+}
+
+i32 CSA_Handler::inverse(i32 pos){
+	i32 anchor = pos/RD;
+	i32 p=anchor*RD;
+	i32 sa=RankL->GetValue(anchor);
+	while(p<pos){
+		sa=Phi->GetValue(sa);
+		p++;
+	}
+	return sa;
+}
+
+i32 CSA_Handler::phiList(i32 i){
+	i32 l=0;
+	i32 r=alphabetsize;
+	i32 m=0;
+	while(l<r){
+		m=(l+r)/2;
+		if(start[m]<=i)
+			l=m+1;
+		else
+			r=m;
+	}
+	return r-1;
+}
+
+i32 CSA_Handler::character(i32 i){
+	return incode[i];
+}
+
+void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence)
+{
+	if(start+len-1>n-1){
+		cerr<<"parmater error: overshot!!!"<<endl;
+		sequence=NULL;
+		exit(0);
+	}
+	sequence = new uchar[len];
+	memset(sequence,0,len*sizeof(uchar));
+	i32 k=0;
+	for(i32 j=0;j<len;j++){
+		k=phiList(start);
+		sequence[j]=character(k);
+		start=phi->GetValue(start);
+	}
+}
 
