@@ -16,7 +16,7 @@ the Free Software Foundation; either version 2 or later of the License.
 class CSA
 {
 	public:
-		CSA(const char * filename,i32 speedlevel);
+		CSA(const char * filename,i32 speedlevel=1);
 		CSA();
 		~CSA(){};
 		CSA(const CSA & right):ct(right.ct){}

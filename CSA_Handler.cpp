@@ -12,7 +12,7 @@ the Free Software Foundation; either version 2 or later of the License.
 #include"ds_ssort.h"
 #include"CSA_Handler.h"
 #include<string.h>
-CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel){
+CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u(){
 	this->speedlevel=speedlevel;
 	this->SL=L*18;
 	this->L=L;
@@ -397,3 +397,11 @@ i32 CSA_Handler::sizeInByteForCount(){
 	return 0;
 }
 
+i32 CSA_Handler::blog(i32 x){
+	i32 ans=0;
+	while(x>0){
+		ans++;
+		x=(x>>1);
+	}
+	return ans;
+}
