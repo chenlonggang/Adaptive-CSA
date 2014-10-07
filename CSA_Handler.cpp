@@ -12,8 +12,7 @@ the Free Software Foundation; either version 2 or later of the License.
 #include"ds_ssort.h"
 #include"CSA_Handler.h"
 #include<string.h>
-CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel)
-{
+CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel){
 	this->speedlevel=speedlevel;
 	this->SL=L*18;
 	this->L=L;
@@ -60,8 +59,7 @@ CSA_Handler::~CSA_Handler(){
 
 }
 
-void CSA_Handler::computerPar(i32 * phi)
-{
+void CSA_Handler::computerPar(i32 * phi){
 	//计算gap中1的比例，依次决定参数 
 	i32 pre=0;
 	i32 gap=0;
@@ -108,8 +106,7 @@ void CSA_Handler::computerPar(i32 * phi)
 	this->RD=this->D*16;
 }
 
-void CSA_Handler::sampleSAAndRank(i32 * SA)
-{
+void CSA_Handler::sampleSAAndRank(i32 * SA){
 	i32 i=0;
 	i32 j=0;
 	i32 step1=D;
@@ -124,8 +121,7 @@ void CSA_Handler::sampleSAAndRank(i32 * SA)
 }
 
 
-i32 * CSA_Handler::phiArray(i32 *SA,uchar * T)
-{
+i32 * CSA_Handler::phiArray(i32 *SA,uchar * T){
 	//计算Phi数组
 	i32 * phi = new i32[n];
 	memset(phi,0,n*sizeof(i32));
@@ -137,11 +133,9 @@ i32 * CSA_Handler::phiArray(i32 *SA,uchar * T)
 	i32 h=0;
 	uchar c=0;
 	i32 pos=0;
-	for(i32 i=0;i<n;i++)
-	{
+	for(i32 i=0;i<n;i++){
 		pos=SA[i];
-		if(pos==0)
-		{
+		if(pos==0){
 			h=i;
 			continue;
 		}
@@ -156,11 +150,9 @@ i32 * CSA_Handler::phiArray(i32 *SA,uchar * T)
 
 
 
-uchar * CSA_Handler::getFile(const char * filename)
-{
+uchar * CSA_Handler::getFile(const char * filename){
 	FILE * fp=fopen(filename,"r+");
-	if(fp==NULL)
-	{
+	if(fp==NULL){
 		cerr<<"Be sure that file is available"<<endl;
 		exit(0);
 	}
@@ -177,8 +169,7 @@ uchar * CSA_Handler::getFile(const char * filename)
 
 	while((e=fread(T+num,sizeof(uchar),n-num,fp))!=0)
 		num=num+e;
-	if(num!=n)
-	{
+	if(num!=n){
 		cerr<<"broken while reading file"<<endl;
 		exit(0);
 	}
@@ -187,8 +178,7 @@ uchar * CSA_Handler::getFile(const char * filename)
 	return T;
 }
 
-void CSA_Handler::statics(uchar *T)
-{
+void CSA_Handler::statics(uchar *T){
 	for(i32 i=0;i<n;i++)
 		code[T[i]]++;
 
@@ -202,8 +192,7 @@ void CSA_Handler::statics(uchar *T)
 	i32 pre=1;
 
 	for(i32 i=0;i<256;i++)
-		if(code[i]!=0)
-		{
+		if(code[i]!=0){
 			start[k]=pre+code[i];
 			pre=start[k];
 			k++;
@@ -212,8 +201,7 @@ void CSA_Handler::statics(uchar *T)
 	this->incode = new i32[alphabetsize];
 	k=0;
 	for(i32 i=0;i<256;i++)
-		if(code[i]!=0)
-		{
+		if(code[i]!=0){
 			code[i]=k;
 			incode[k]=i;
 			k++;
@@ -223,19 +211,16 @@ void CSA_Handler::statics(uchar *T)
 	lastchar=T[n-1];
 }
 
-void CSA_Handler::Counting(const char * pattern,i32 &num)
-{
+void CSA_Handler::Counting(const char * pattern,i32 &num){
 	i32 L=0;
 	i32 R=0;
 	countSearch(pattern,L,R);
 	num=R-L+1;
 }
 
-i32 CSA_Handler::lookUp(i32 i)
-{
+i32 CSA_Handler::lookUp(i32 i){
 	i32 step=0;
-	while(i%D!=0)
-	{
+	while(i%D!=0){
 		i=phi->getValue(i);
 		step++;
 	}
@@ -243,8 +228,7 @@ i32 CSA_Handler::lookUp(i32 i)
 	return (n+SAL->GetValue(i)-step)%n;
 }
 
-void CSA_Handler::Locating(const char * pattern,i32 &num,i32 *&pos)
-{
+void CSA_Handler::Locating(const char * pattern,i32 &num,i32 *&pos){
 	i32 L=0;
 	i32 R=0;
 	this->countSearch(pattern,L,R);
@@ -285,8 +269,7 @@ i32 CSA_Handler::character(i32 i){
 	return incode[i];
 }
 
-void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence)
-{
+void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence){
 	if(start+len-1>n-1){
 		cerr<<"parmater error: overshot!!!"<<endl;
 		sequence=NULL;
@@ -302,8 +285,7 @@ void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence)
 	}
 }
 
-void CSA_Handler::countSearch(const char * pattern,i32 &L,i32 &R)
-{
+void CSA_Handler::countSearch(const char * pattern,i32 &L,i32 &R){
 	i32 i;
 	i32 jj;
 	i32 middle;

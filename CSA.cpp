@@ -19,23 +19,19 @@ i32 CSA::getAlphabetSize(){
 	return ct.getAlphabetSize();
 }
 
-i32 CSA::getN()
-{
+i32 CSA::getN(){
 	return ct.getN();
 }
 
-i32 CSA::sizeInByte()
-{
+i32 CSA::sizeInByte(){
 	return ct.sizeInByte();
 }
 
-i32 CSA::sizeInByteForCount()
-{
+i32 CSA::sizeInByteForCount(){
 	return ct.sizeInByteForCount();
 }
 
-i32 CSA::Save(const char * indexfile)
-{
+i32 CSA::Save(const char * indexfile){
 	savekit s(indexfile);
 	s.writeu64(198809102510);
 	ct.Save(s);
@@ -43,13 +39,11 @@ i32 CSA::Save(const char * indexfile)
 	return 0;
 }
 
-i32 CSA::Load(const char * indexfile)
-{
+i32 CSA::Load(const char * indexfile){
 	loadkit s(indexfile);
 	u64 magicnum=0;
 	s.loadu64(magicnum);
-	if(magicnum==198809102510)
-	{
+	if(magicnum==198809102510){
 		cerr<<"Not a CSA_index file"<<endl;
 		exit(0);
 	}
@@ -58,18 +52,15 @@ i32 CSA::Load(const char * indexfile)
 	return 0;
 }
 
-void CSA::Counting(const char * pattern,i32 &num)
-{
+void CSA::Counting(const char * pattern,i32 &num){
 	ct.Counting(pattern,num);
 }
 
-void CSA::Locating(const char * pattern,i32  &num,int *&pos)
-{
+void CSA::Locating(const char * pattern,i32  &num,int *&pos){
 	ct.Locating(pattern,num,pos);
 }
 
-void CSA::Extracting(i32 start,i32 len,uchar *&sequence)
-{
+void CSA::Extracting(i32 start,i32 len,uchar *&sequence){
 	ct.Extracting(start,len,sequence);
 }
 

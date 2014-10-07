@@ -16,19 +16,17 @@ the Free Software Foundation; either version 2 or later of the License.
 using namespace std;
 
 
-InArray::~InArray(void)
-{
+InArray::~InArray(void){
 	delete [] data;
 }
-InArray::InArray()
-{
+
+InArray::InArray(){
 }
-InArray::InArray(i32 data_num, i32 data_width) 
-{
+
+InArray::InArray(i32 data_num, i32 data_width) {
 	if(data_num<0||data_width<=0)
 		cout<<"InArray构造参数输入错误"<<endl;
-	else
-	{
+	else{
 		this->datanum =data_num;
 		this->datawidth =data_width;
 	    i64 totlesize=datanum*datawidth;
@@ -43,21 +41,17 @@ InArray::InArray(i32 data_num, i32 data_width)
 }
 
 //数组中下标为index的位置设置值为value
-void InArray::SetValue (i32 index, i32 v)
-{
+void InArray::SetValue (i32 index, i32 v){
 
-	if(index>datanum-1|| index<0)
-	{
+	if(index>datanum-1|| index<0){
 		cerr<<"InArray:index out of boundary"<<endl;
 		exit(0) ;
 	}
-	else if(v>((1<<datawidth)-1))
-	{
+	else if(v>((1<<datawidth)-1)){
 		cerr<<"InArray:value is out of boundary"<<endl;
 		exit(0) ;
 	}
-	else
-	{
+	else{
 		u64 value=v;
 		u64 anchor=(index*datawidth)>>5;
 		u64 temp1=data[anchor];
@@ -74,25 +68,21 @@ void InArray::SetValue (i32 index, i32 v)
 
 }
 
-i32 InArray::GetNum ()
-{
+i32 InArray::GetNum (){
 	return datanum;
 }
-i32 InArray::GetMemorySize() 
-{
+
+i32 InArray::GetMemorySize() {
 	return (datanum*datawidth)/8;
 }
 
 		
-i32 InArray::GetDataWidth() 
-{
+i32 InArray::GetDataWidth() {
 	return datawidth;
 }
 
-i32 InArray::GetValue(i32 index)
-{
-	if(index>datanum-1||index<0)
-	{
+i32 InArray::GetValue(i32 index){
+	if(index>datanum-1||index<0){
 		cerr<<"InArray:GetValue: index out of boundary"<<endl;
 		exit(0);
 	}
@@ -103,12 +93,9 @@ i32 InArray::GetValue(i32 index)
 	temp1=(temp1<<32)+temp2;
 	i32 overloop=((anchor+2)<<5)-(index+1)*datawidth;
 	return (temp1>>overloop)&mask;
-
-
-
 }
-i32 InArray::write(savekit & s)
-{
+
+i32 InArray::write(savekit & s){
 	s.writei32(datanum);
 	s.writei64(datawidth);
 	i64 len=(datanum*datawidth);
@@ -121,8 +108,8 @@ i32 InArray::write(savekit & s)
 	s.writeu32array(data,len);
 	return 1;
 }
-i32 InArray::load(loadkit & s)
-{
+
+i32 InArray::load(loadkit & s){
 	s.loadi32(datanum);
 	s.loadi64(datawidth);
 	i32 len=0;
