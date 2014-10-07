@@ -11,21 +11,25 @@ the Free Software Foundation; either version 2 or later of the License.
 =============================================*/
 #ifndef CSA_Handler_H
 #define CSA_Handler_H
+#include"BaseClass.h"
+#include"InArray.h"
+#include"Phi.h"
+#include"UseCount.h"
 class CSA_Handler
 {
 	public:
 		CSA_Handler(){};
-		CSA_Handler(const char*sourcefile,i32 L=128,i32 D=32,i32 speedlevel);
-		//CSA_Handler(const CSA_Handler &);
-		//CSA_Handler & operator =(const CSA_Handler &);
+		CSA_Handler(const char*sourcefile,i32 L=128,i32 D=32,i32 speedlevel=1);
+		CSA_Handler(const CSA_Handler &);
+		CSA_Handler & operator =(const CSA_Handler &);
 		~CSA_Handler();
 
 		void Counting(const char * pattern,i32 &num);
 		void  Locating(const char * pattern,i32 &num,i32 *& pos);
 		void Extracting(i32 start,i32 len,uchar *& sequence);
 
-		i32 Save(const char * indexfile);
-		i32 Load(const char * indexfile);
+		i32 Save(savekit & s);
+		i32 Load(loadkit & s);
 
 		i32 getAlphabetSize();
 		i32 getN();
@@ -45,14 +49,14 @@ class CSA_Handler
 		void countSearch(const char * pattern,i32 &L,i32 &R);
 
 		//读取文件，初始化各种表。
-		uchar * Getfile(const char * filename);
+		uchar * getFile(const char * filename);
 		void statics(uchar * T);
 		//计算出Phi数组
-		i32 * phi phiArray();
+		i32 * phiArray(i32 * SA,uchar * T);
 		//根据gap序列中1的比例，决定threshhold。
-		void computePar(i32 * phi);
+		void computerPar(i32 * phi);
 		//采样SA and Rank
-		void sampleSAAndRank();
+		void sampleSAAndRank(i32 *SA);
 		i32 blog(i32 x);
 		//分别表示:Phi超快的大小，块大小，SA采样补偿，Rank采样步长
 		i32 SL,L,D,RD;
@@ -72,9 +76,10 @@ class CSA_Handler
 		uchar lastchar;
 		//Phi结构
 		Phi * phi;
-
+		
+		i32 speedlevel;
 		//operator=和拷贝构造实现浅拷贝，引用计数在这里实现
 		UseCount u;
-}
+};
 #endif
 

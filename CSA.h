@@ -12,6 +12,7 @@ the Free Software Foundation; either version 2 or later of the License.
 #ifndef CSA_H
 #define CSA_H
 #include"CSA_Handler.h"
+#include"BaseClass.h"
 class CSA
 {
 	public:
@@ -29,6 +30,7 @@ class CSA
 		i32 Save(const char * indexfile);
 
 		i32 getN();
+		i32 getAlphabetSize();
 		i32 sizeInByte();
 		i32 sizeInByteForCount();
 	private:

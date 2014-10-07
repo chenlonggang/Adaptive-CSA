@@ -1,5 +1,5 @@
 /*============================================
-# Filename: Phi.h
+# Filename: Phi.cpp
 # Ver 1.0 2014-10-07
 # Copyright (C) 2014 ChenLonggang (chenlonggang.love@163.com)
 #
@@ -9,18 +9,16 @@ the Free Software Foundation; either version 2 or later of the License.
 #
 # Description: 
 =============================================*/
-#ifndef PHI_H
-#define PHI_H
-#include"BaseClass.h"
-class Phi
-{
-	public:
-		Phi(i32 * phiarray,i32 n,i32 blocksize);
-		i32 getValue(const i32 index);
-	private:
-		i32 n;
-		i32 a;
-		i32 b;
-		i32 *value;
-};
-#endif
+#include"Phi.h"
+Phi::Phi(i32 * phiarray,i32 n,i32 bs){
+	this->n=n;
+	this->b=bs;
+	this->a=18*b;
+	value=new i32[n];
+	for(i32 i=0;i<n;i++)
+		value[i]=phiarray[i];
+}
+i32 Phi::getValue(const i32 index){
+	return value[index];
+}
+

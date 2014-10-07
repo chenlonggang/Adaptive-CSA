@@ -15,6 +15,10 @@ CSA::CSA(const char * filename,i32 speedlevel):ct(filename,128,32,speedlevel){}
 
 CSA::CSA():ct(){}
 
+i32 CSA::getAlphabetSize(){
+	return ct.getAlphabetSize();
+}
+
 i32 CSA::getN()
 {
 	return ct.getN();
@@ -39,7 +43,7 @@ i32 CSA::Save(const char * indexfile)
 	return 0;
 }
 
-i32 FM::Load(const char * indexfile)
+i32 CSA::Load(const char * indexfile)
 {
 	loadkit s(indexfile);
 	u64 magicnum=0;
@@ -49,7 +53,7 @@ i32 FM::Load(const char * indexfile)
 		cerr<<"Not a CSA_index file"<<endl;
 		exit(0);
 	}
-	wt.Load(s);
+	ct.Load(s);
 	s.close();
 	return 0;
 }
@@ -64,7 +68,8 @@ void CSA::Locating(const char * pattern,i32  &num,int *&pos)
 	ct.Locating(pattern,num,pos);
 }
 
-void CSA::Extracting(i32 start,i32 len,i32 *&sequence)
+void CSA::Extracting(i32 start,i32 len,uchar *&sequence)
 {
 	ct.Extracting(start,len,sequence);
 }
+

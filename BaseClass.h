@@ -26,4 +26,5 @@ the Free Software Foundation; either version 2 or later of the License.
 #define i16 short
 #define si16 static short
 #define uchar unsigned char
+#define u8 unsigned char
 #endif

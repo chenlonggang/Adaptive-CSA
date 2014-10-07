@@ -9,9 +9,12 @@ the Free Software Foundation; either version 2 or later of the License.
 #
 # Description: 
 =============================================*/
-
+#include"ds_ssort.h"
+#include"CSA_Handler.h"
+#include<string.h>
 CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel)
 {
+	this->speedlevel=speedlevel;
 	this->SL=L*18;
 	this->L=L;
 	this->D=D;
@@ -20,7 +23,7 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel)
 	this->code = new i32[256];
 	memset(code,0,256*sizeof(i32));
 
-	thia->slphabetsize=0;
+	this->alphabetsize=0;
 	uchar * T=NULL;
 	//读取文件
 	T=getFile(sourcefile);
@@ -30,7 +33,7 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel)
 	//计算后缀数组 
 	ds_ssort(T,SA,n);
 	//计算Phi数组
-	i32 * phiarray = phiArray();
+	i32 * phiarray = phiArray(SA,T);
 	
 	delete [] T;//T is useless now
 	T=NULL;
@@ -38,7 +41,7 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel)
 	//ratio暂时不决定D和RD，只决定L和SL.
 	computerPar(phiarray);
 	//采样SAL和RankL
-	sampleSAAndRank();
+	sampleSAAndRank(SA);
 	//from now on ,SA is useless;
 	delete [] SA;
 	SA=NULL;
@@ -46,14 +49,18 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel)
 	//phiArray:Phi数组
 	//n:Phi数组长度
 	//L:块大小，超快大小固定位块大小的18倍,不用传.
-	phi = new Phi(phiArray,n,L);
+	phi = new Phi(phiarray,n,L);
 	
 	delete [] phiarray;
 	phiarray=NULL;
 
 }
 
-void CSA_Handler::computePar(i32 * phi)
+CSA_Handler::~CSA_Handler(){
+
+}
+
+void CSA_Handler::computerPar(i32 * phi)
 {
 	//计算gap中1的比例，依次决定参数 
 	i32 pre=0;
@@ -101,7 +108,7 @@ void CSA_Handler::computePar(i32 * phi)
 	this->RD=this->D*16;
 }
 
-void CSA_Handle::sampleSAAndRank()
+void CSA_Handler::sampleSAAndRank(i32 * SA)
 {
 	i32 i=0;
 	i32 j=0;
@@ -117,7 +124,7 @@ void CSA_Handle::sampleSAAndRank()
 }
 
 
-i32 * CSA_Handler::phiArray()
+i32 * CSA_Handler::phiArray(i32 *SA,uchar * T)
 {
 	//计算Phi数组
 	i32 * phi = new i32[n];
@@ -144,6 +151,7 @@ i32 * CSA_Handler::phiArray()
 	phi[index]=h;
 	delete [] temp;
 	temp=NULL;
+	return phi;
 }
 
 
@@ -223,12 +231,12 @@ void CSA_Handler::Counting(const char * pattern,i32 &num)
 	num=R-L+1;
 }
 
-i32 CSA_Handler::lookUp(i32 sa)
+i32 CSA_Handler::lookUp(i32 i)
 {
 	i32 step=0;
 	while(i%D!=0)
 	{
-		i=phi->GetValue(i);
+		i=phi->getValue(i);
 		step++;
 	}
 	i=i/D;
@@ -253,7 +261,7 @@ i32 CSA_Handler::inverse(i32 pos){
 	i32 p=anchor*RD;
 	i32 sa=RankL->GetValue(anchor);
 	while(p<pos){
-		sa=Phi->GetValue(sa);
+		sa=phi->getValue(sa);
 		p++;
 	}
 	return sa;
@@ -290,7 +298,120 @@ void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence)
 	for(i32 j=0;j<len;j++){
 		k=phiList(start);
 		sequence[j]=character(k);
-		start=phi->GetValue(start);
+		start=phi->getValue(start);
 	}
+}
+
+void CSA_Handler::countSearch(const char * pattern,i32 &L,i32 &R)
+{
+	i32 i;
+	i32 jj;
+	i32 middle;
+	i32 left;
+	i32 right;
+	i32 templeft;
+	i32 tempright;
+	i32 mleft;
+	i32 mright;
+	i32 Left;
+	i32 Right;
+	
+	i32 len = strlen(pattern);
+	uchar c=pattern[len-1];
+	i32 coding=code[c];
+	if(coding>alphabetsize-1 || coding<0){
+		L=1;
+		R=0;
+		return ;
+	}
+
+	Left =start[coding];
+	Right=start[coding+1]-1;
+
+	for(i=len-2;i>=0;i--){
+		c=pattern[i];
+		coding=code[c];
+		if(coding>alphabetsize-1 || coding<0){
+			L=1;
+			R=0;
+			return ;
+		}
+		left=start[coding];
+		right=start[coding+1]-1;
+		if(coding==code[lastchar])
+			left=left+1;
+		if(left>right || phi->getValue (left)>Right || phi->getValue (right)<Left){
+			L=1;
+			R=0;
+			return ;
+		}
+		else{
+			mleft=left;
+			mright=right;
+			while(mright-mleft>1){
+				middle = (mleft+mright)/2;
+				jj=phi->getValue(middle);
+				if(jj<Left)
+					mleft=middle;
+				else
+					mright=middle;
+			}
+			jj=phi->getValue (mleft);
+			if(jj>=Left && jj<=Right)
+				templeft=mleft;
+			else
+				templeft=mright;
+			mleft=left;
+			mright=right;
+			while(mright-mleft>1){
+				middle=(mleft+mright)/2;
+				jj=phi->getValue (middle);
+				if(jj>Right)
+					mright=middle;
+				else
+					mleft=middle;
+			}
+			jj=phi->getValue (mright);
+			if(jj>=Left && jj<=Right)
+				tempright=mright;
+			else
+				tempright=mleft;
+			Left=templeft;
+			Right=tempright;
+			if(Left>Right){
+				L=1;
+				R=0;
+				return ;
+			}
+		}
+	}
+	if(Left>Right)
+		L=1,R=0;
+	else
+		L=Left,R=Right;
+}
+
+i32 CSA_Handler::Save(savekit & s){
+	return 0;
+}
+
+i32 CSA_Handler::Load(loadkit & s){
+	return 0;
+}
+
+i32 CSA_Handler::getAlphabetSize(){
+	return alphabetsize;
+}
+
+i32 CSA_Handler::getN(){
+	return n;
+}
+
+i32 CSA_Handler::sizeInByte(){
+	return 0;
+}
+
+i32 CSA_Handler::sizeInByteForCount(){
+	return 0;
 }
 
