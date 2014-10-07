@@ -9,6 +9,8 @@ the Free Software Foundation; either version 2 or later of the License.
 #
 # Description: 
 =============================================*/
+#ifndef PHI_H
+#define PHI_H
 class Phi
 {
 	public:
@@ -16,4 +18,5 @@ class Phi
 		i32 getValue(const i32 index);
 		i32 & operator [](const i32 index);
 	private:
-}
+};
+#endif
