@@ -43,6 +43,7 @@ class Phi
 		i32 n;
 		i32 a;
 		i32 b;
+		i32 index;
 		i32 *value;
 		i32 lenofsequence;
 		i32 lenofsuperoffset;
@@ -65,5 +66,7 @@ class Phi
 		/*编码Phi数组，按照计算出来的编码方法编码phi数组
 		*/   
 		void codeAndFill();
+		void Append(i32 x);
+		void MethodsStatic();
 };
 #endif
