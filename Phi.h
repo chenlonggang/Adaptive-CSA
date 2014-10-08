@@ -11,6 +11,7 @@ the Free Software Foundation; either version 2 or later of the License.
 =============================================*/
 #ifndef PHI_H
 #define PHI_H
+#include"string.h"
 #include"BaseClass.h"
 #include"loadkit.h"
 #include"savekit.h"
@@ -23,9 +24,35 @@ class Phi
 		i32 load(loadkit & h);
 		i32 write(savekit& h);
 	private:
+		/*
+		methods:每块的编码方法：0-->puregamma,1-->rl+gamma,2-->all1
+		superoffset:超快的偏移位置。
+		offset:快相对于所属超快的偏移量 
+		samples:快的采样值
+		sequence:编码序列。
+		*/
+		InArray * methods;
+		i32 * superoffset;
+		InArray * offset;
+		InArray * samples;
+		u32 * sequence;
+
 		i32 n;
 		i32 a;
 		i32 b;
 		i32 *value;
+		i32 lenofsequence;
+		//最大的超快的大小
+		i32 maxsbs;
+
+		/*计算编码方法和总空间
+		  这个地方可以返回具体的快在
+		  sequence中的其实位置，这样就
+		  可以并行了。
+		  但是建立CSA的时间不太重要，并且构建CSA的时间主要花费zai
+		  计算SA上，所以是没有必要这么做的。
+		*/
+		void methodsAndSpace();
+		i32 blogsize(i32 x);
 };
 #endif
