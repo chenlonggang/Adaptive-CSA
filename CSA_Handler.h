@@ -25,7 +25,7 @@ class CSA_Handler
 		~CSA_Handler();
 
 		void Counting(const char * pattern,i32 &num);
-		void  Locating(const char * pattern,i32 &num,i32 *& pos);
+		void Locating(const char * pattern,i32 &num,i32 *& pos);
 		void Extracting(i32 start,i32 len,uchar *& sequence);
 
 		i32 Save(savekit & s);
@@ -58,6 +58,8 @@ class CSA_Handler
 		//采样SA and Rank
 		void sampleSAAndRank(i32 *SA);
 		i32 blog(i32 x);
+		void deletePointers();
+		void assignDataMembers(const CSA_Handler & h);
 		//分别表示:Phi超快的大小，块大小，SA采样补偿，Rank采样步长
 		i32 SL,L,D,RD;
 		//分别表示SA的采样数组和Rank的采样数组

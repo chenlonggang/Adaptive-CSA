@@ -18,7 +18,15 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	for(i32 i=0;i<n;i++)
 		value[i]=phiarray[i];
 }
+
 i32 Phi::getValue(const i32 index){
 	return value[index];
 }
 
+i32 Phi::load(loadkit & h){
+	return 0;
+}
+
+i32 Phi::write(savekit & h){
+	return 0;
+}

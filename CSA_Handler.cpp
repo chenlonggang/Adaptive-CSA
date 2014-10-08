@@ -55,10 +55,43 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u()
 
 }
 
-CSA_Handler::~CSA_Handler(){
-
+CSA_Handler::CSA_Handler(const CSA_Handler & h):u(h.u){
+	assignDataMembers(h);
 }
 
+CSA_Handler & CSA_Handler::operator =(const CSA_Handler &h){
+	if(u.reattach(h.u))
+		deletePointers();
+	assignDataMembers(h);
+	return *this;
+}
+
+CSA_Handler::~CSA_Handler(){
+	if(u.only())
+		deletePointers();
+}
+
+void CSA_Handler::assignDataMembers(const CSA_Handler & h){
+	n=h.n;
+	code=h.code;
+	incode=h.incode;
+	start=h.start;
+	alphabetsize=h.alphabetsize;
+	lastchar=h.lastchar;
+	phi=h.phi;
+	speedlevel=h.speedlevel;
+}
+void CSA_Handler::deletePointers(){
+	if(SAL)	  delete SAL;
+	if(RankL) delete RankL;
+	if(phi)   delete phi;
+	if(code)  delete [] code;
+	if(incode)delete [] incode;
+	if(start) delete [] start;
+	SAL=RankL=NULL;
+	phi=NULL;
+	code=incode=start=NULL;
+}
 void CSA_Handler::computerPar(i32 * phi){
 	//计算gap中1的比例，依次决定参数 
 	i32 pre=0;
@@ -373,13 +406,6 @@ void CSA_Handler::countSearch(const char * pattern,i32 &L,i32 &R){
 		L=Left,R=Right;
 }
 
-i32 CSA_Handler::Save(savekit & s){
-	return 0;
-}
-
-i32 CSA_Handler::Load(loadkit & s){
-	return 0;
-}
 
 i32 CSA_Handler::getAlphabetSize(){
 	return alphabetsize;
@@ -405,3 +431,61 @@ i32 CSA_Handler::blog(i32 x){
 	}
 	return ans;
 }
+
+i32 CSA_Handler::Save(savekit &s){
+	s.writei32(n);
+	s.writei32(alphabetsize);
+	s.writei32(SL);
+	s.writei32(L);
+	s.writei32(D);
+	s.writei32(RD);
+
+	SAL->write(s);
+	RankL->write(s);
+	//code
+	s.writei32(256);
+	s.writei32array(code,256);
+	//start
+	s.writei32(alphabetsize+1);
+	s.writei32array(start,alphabetsize+1);
+	//incode
+	s.writei32(alphabetsize);
+	s.writei32array(incode,alphabetsize);
+	//phi
+	phi->write(s);
+	return 0;
+}
+
+i32 CSA_Handler::Load(loadkit & s){
+	s.loadi32(n);
+	s.loadi32(alphabetsize);
+	s.loadi32(SL);
+	s.loadi32(L);
+	s.loadi32(D);
+	s.loadi32(RD);
+	
+	SAL=new InArray();
+	SAL->load(s);
+
+	RankL=new InArray();
+	RankL->load(s);
+	//code
+	i32 len=0;
+	s.loadi32(len);
+	code=new i32[len];
+	s.loadi32array(code,len);
+	//start
+	s.loadi32(len);
+	start=new i32[len];
+	s.loadi32array(start,len);
+	//incode
+	s.loadi32(len);
+	incode=new i32[len];
+	s.loadi32array(incode,len);
+
+	phi=new Phi();
+	phi->load(s);
+	return 0;
+}
+	
+

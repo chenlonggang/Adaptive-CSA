@@ -12,11 +12,16 @@ the Free Software Foundation; either version 2 or later of the License.
 #ifndef PHI_H
 #define PHI_H
 #include"BaseClass.h"
+#include"loadkit.h"
+#include"savekit.h"
 class Phi
 {
 	public:
 		Phi(i32 * phiarray,i32 n,i32 blocksize);
+		Phi(){}
 		i32 getValue(const i32 index);
+		i32 load(loadkit & h);
+		i32 write(savekit& h);
 	private:
 		i32 n;
 		i32 a;
