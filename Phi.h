@@ -21,6 +21,7 @@ class Phi
 	public:
 		Phi(i32 * phiarray,i32 n,i32 blocksize);
 		Phi(){}
+		~Phi();
 		i32 getValue(const i32 index);
 		i32 load(loadkit & h);
 		i32 write(savekit& h);
@@ -38,6 +39,7 @@ class Phi
 		InArray * samples;
 		u32 * sequence;
 
+		u16 *zerostable;
 		i32 n;
 		i32 a;
 		i32 b;
@@ -46,6 +48,8 @@ class Phi
 		i32 lenofsuperoffset;
 		//最大的超快的大小
 		i32 maxsbs;
+		i32 blogsize(i32 x);
+		void initZeroTable();
 
 		/*计算编码方法和总空间
 		  这个地方可以返回具体的快在
@@ -55,7 +59,11 @@ class Phi
 		  计算SA上，所以是没有必要这么做的。
 		*/
 		void methodsAndSpace();
+		/*根据第一步算出来的空间申请空间并初始化为0.
+		*/
 		void allocAndInit();
-		i32 blogsize(i32 x);
+		/*编码Phi数组，按照计算出来的编码方法编码phi数组
+		*/   
+		void codeAndFill();
 };
 #endif

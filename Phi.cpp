@@ -22,7 +22,21 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	*/
 	methodsAndSpace();
 	allocAndInit();
+	initZeroTable();
+	codeAndFill();
+}
 
+Phi::~Phi(){
+	if(superoffset)	delete [] superoffset;
+	if(samples)     delete samples;
+	if(offset)      delete offset;
+	if(sequence)    delete [] sequence;
+	if(zerostable)  delete [] zerostable;
+	
+	samples=offset=NULL;
+	superoffset=NULL;
+	sequence=NULL;
+	zerostable=NULL;
 }
 
 i32 Phi::getValue(const i32 index){
@@ -108,15 +122,29 @@ void Phi::methodsAndSpace(){
 	maxsbs=maxlen;
 }
 
+void Phi::initZeroTable(){
+	i32 D=16;
+	for(i32 i=0;i<D;i++){
+		for(i32 j=(1<<i);j<(2<<i);j++)
+			zerostable[j]=D-1-i;
+	}
+	zerostable[0]=D;
+}
+	
 void Phi::allocAndInit(){
 	this->superoffset=new i32[lenofsuperoffset];
 	this->offset=new InArray(n/b+1,blogsize(maxsbs));
 	this->samples=new InArray(n/b+1,blogsize(n));
 	this->sequence=new u32[lenofsequence];
+	this->zerostable = new u16[1<<16];
+	memset(zerostable,0,sizeof(u16)*(1<<16));
 	memset(superoffset,0,sizeof(i32)*lenofsuperoffset);
 	memset(sequence,0,sizeof(u32)*lenofsequence);
 }
 
+void Phi::codeAndFill(){
+
+}
 
 
 
