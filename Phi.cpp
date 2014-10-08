@@ -189,34 +189,30 @@ void Phi::codeAndFill(){
 		if(gap<0)
 			gap=gap+n;
 		pre=value[i];
-		if(method==0){//gamma编码
-			len1=len1+2*blogsize(gap)-1;
-			Append(gap);
+		
+		switch(method){
+			case 0:len1=len1+2*blogsize(gap)-1;Append(gap);break;
+			case 1:
+				   if(gap==1){
+					   runs++;
+					   if((i+1)%b==0){
+						   len1=len1+2*blogsize(2*runs)-1;
+						   Append(2*runs);
+						   runs=0;
+					   }
+				   }
+				   else{
+					   if(runs!=0){
+						   len1=len1+2*blogsize(2*runs)-1;
+						   Append(2*runs);
+					   }
+					   len1=len1+2*blogsize(2*gap-3)-1;
+					   Append(2*gap-3);
+					   runs=0;
+				   };break;
+			case 2:len1=len1+0;break;
+			default:cerr<<"method error"<<endl;break;
 		}
-		else if(method==1){//rl+g
-			if(gap==1){
-				runs++;
-				if((i+1)%b==0){
-					len1=len1+2*blogsize(2*runs)-1;
-					Append(2*runs);
-					runs=0;
-				}
-			}
-			else{
-				if(runs!=0){
-					len1=len1+2*blogsize(2*runs)-1;
-					Append(2*runs);
-				}
-				len1=len1+2*blogsize(2*gap-3)-1;
-				Append(2*gap-3);
-				runs=0;
-			}
-		}
-		else if(method==2){ //all1
-			len1=len1+0;
-		}
-		else
-			cerr<<"error method"<<endl;
 	}
 }
 
