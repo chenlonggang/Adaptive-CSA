@@ -13,6 +13,7 @@ the Free Software Foundation; either version 2 or later of the License.
 #define PHI_H
 #include"string.h"
 #include"BaseClass.h"
+#include"InArray.h"
 #include"loadkit.h"
 #include"savekit.h"
 class Phi
@@ -42,6 +43,7 @@ class Phi
 		i32 b;
 		i32 *value;
 		i32 lenofsequence;
+		i32 lenofsuperoffset;
 		//最大的超快的大小
 		i32 maxsbs;
 
@@ -53,6 +55,7 @@ class Phi
 		  计算SA上，所以是没有必要这么做的。
 		*/
 		void methodsAndSpace();
+		void allocAndInit();
 		i32 blogsize(i32 x);
 };
 #endif
