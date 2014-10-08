@@ -79,4 +79,5 @@
 				right,and then,focus on Phi class  
 	2014.10.8: Save and Load function for CSA is OK.Phi class is on the way.
 	           I design three code/decode mehod:three are:pure-gamma,rl+gamma,ALL1,
-			   both are good at different situations.
+			   both are good at different situations.  
+	2014.10.8: code Phi array using three methods,it seems right...
