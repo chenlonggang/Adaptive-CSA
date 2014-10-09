@@ -23,9 +23,12 @@ class Phi
 		Phi(){}
 		~Phi();
 		i32 getValue(const i32 index);
+		i32 * getPhiArray();
+		i32 sizeInByte();
+		i32 leftBoundary(i32 l,i32 L,i32 R);
+		i32 rightBoundary(i32 r,i32 L,i32 R);
 		i32 load(loadkit & h);
 		i32 write(savekit& h);
-		i32 * getPhiArray();
 	private:
 		/*
 		methods:每块的编码方法：0-->puregamma,1-->rl+gamma,2-->all1
@@ -72,9 +75,14 @@ class Phi
 		i32 zeroRun(i32 &position);
 		i32 getBits(i32 position,i32 bits);
 
-		/*
+		i32 gammaSequence(i32 position,i32 base,i32 num);
+		i32 rlgSequence(i32 position,i32 base,i32 num);
+		i32 all1Sequence(i32 position,i32 base,i32 num);
+
+		/*以下函数位验证正确性只用。
 		*/
 		void MethodsStatic();
-		bool checkCodeAndDecode();
+		bool checkCodeAndFill_getPhiArray();
+		bool checkgetValue();
 };
 #endif

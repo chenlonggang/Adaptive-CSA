@@ -29,10 +29,11 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	codeAndFill();
 
 	//MethodsStatic();
-	cout<<"code is "<<(checkCodeAndDecode()==1?"right":"wrong")<<endl;
+	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
+	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
 }
 
-bool Phi::checkCodeAndDecode(){
+bool Phi::checkCodeAndFill_getPhiArray(){
 	i32 * array=getPhiArray();
 	for(i32 i=0;i<n;i++)
 		if(value[i]!=array[i]){
@@ -63,11 +64,11 @@ Phi::~Phi(){
 	zerostable=NULL;
 
 }
-
+/*
 i32 Phi::getValue(const i32 index){
 	return value[index];
 }
-
+*/
 i32 Phi::load(loadkit & h){
 	return 0;
 }
@@ -322,6 +323,65 @@ i32 * Phi::getPhiArray(){
 	}
 	return phiarray;
 }
+
+bool Phi::checkgetValue(){
+	for(int i=0;i<n;i++){
+		if(value[i]!=getValue(i)){
+			cout<<value[i]<<" "<<getValue(i)<<" "<<i<<endl;
+			return false;
+		}
+	}
+	return true;
+}
+
+i32 Phi::getValue(const i32 index){
+	i32 base=samples->GetValue(index/b);
+	i32 overloop=index%b;
+	i32 position=superoffset[index/a]+offset->GetValue(index/b);
+	i32 method=methods->GetValue(index/b);
+	switch(method){
+		case 0:return gammaSequence(position,base,overloop);
+		case 1:return rlgSequence(position,base,overloop);
+		case 2:return all1Sequence(position,base,overloop);
+		default:cerr<<"method error"<<endl;exit(0);
+	}
+}
+
+i32 Phi::gammaSequence(i32 position,i32 base,i32 num){
+	i32 i=0;
+	i32 value=0;
+	while(i<num){
+		decodeGamma(position,value);
+		base=(base+value)%n;
+		i++;
+	}
+	return base;
+}
+
+i32 Phi::rlgSequence(i32 position,i32 base,i32 num){
+	i32 i=0;
+	i32 value=0;
+	while(i<num){
+		decodeGamma(position,value);
+		if(value%2==0){
+			if(i+value/2>=num)
+				return (base+num-i)%n;
+			base=(base+value/2)%n;
+			i=i+value/2;
+		}
+		else{
+			base=(base+(value+3)/2)%n;
+			i++;
+		}
+	}
+	return base;
+}
+
+i32 Phi::all1Sequence(i32 position,i32 base,i32 num){
+	return (base+num)%n;
+}
+
+
 
 
 

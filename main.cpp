@@ -11,5 +11,6 @@ int main(){
 	c=csa;
 	c.Counting("the",counts);
 	cout<<counts<<endl;
+	
 	return 0;
 }
