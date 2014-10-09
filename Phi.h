@@ -25,6 +25,7 @@ class Phi
 		i32 getValue(const i32 index);
 		i32 load(loadkit & h);
 		i32 write(savekit& h);
+		i32 * getPhiArray();
 	private:
 		/*
 		methods:每块的编码方法：0-->puregamma,1-->rl+gamma,2-->all1
@@ -67,6 +68,13 @@ class Phi
 		*/   
 		void codeAndFill();
 		void Append(i32 x);
+		i32 decodeGamma(i32 &position,i32 &value);
+		i32 zeroRun(i32 &position);
+		i32 getBits(i32 position,i32 bits);
+
+		/*
+		*/
 		void MethodsStatic();
+		bool checkCodeAndDecode();
 };
 #endif

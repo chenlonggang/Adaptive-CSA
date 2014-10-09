@@ -28,7 +28,18 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	initZeroTable();
 	codeAndFill();
 
-	MethodsStatic();
+	//MethodsStatic();
+	cout<<"code is "<<(checkCodeAndDecode()==1?"right":"wrong")<<endl;
+}
+
+bool Phi::checkCodeAndDecode(){
+	i32 * array=getPhiArray();
+	for(i32 i=0;i<n;i++)
+		if(value[i]!=array[i]){
+			cout<<value[i]<<" "<<array[i]<<" "<<i<<endl;
+			return false;
+		}
+	return true;
 }
 
 void Phi::MethodsStatic(){
@@ -113,7 +124,7 @@ void Phi::methodsAndSpace(){
 			pre=value[j];
 			
 			if((j+1)%b==0 || (j+1)==n){
-				if(runs==b){//ALL1
+				if(runs==b-1){//ALL1
 					methods->SetValue(j/b,2);
 					len=len+0;
 				}
@@ -229,7 +240,90 @@ void Phi::Append(i32 x){
 	sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
 	index=index+valuewidth;
 }
-	
+
+i32 Phi::decodeGamma(i32 & position,i32 & value){
+	i32 a=this->zeroRun(position);
+	value=getBits(position,a+1);
+	position=position+a+1;
+	return 2*a+1;
+}
+
+i32 Phi::zeroRun(i32 & position){
+	i32 y=0;
+	i32 D=16;
+	i32 x=getBits(position,D);
+	i32 w=y=zerostable[x];
+	while(y==D){
+		position=position+D;
+		x=getBits(position,D);
+		y=zerostable[x];
+		w=w+y;
+	}
+	position=position+y;
+	return w;
+}
+
+i32 Phi::getBits(i32 position,i32 num){
+	u32 anchor=(position>>5);
+	u64 temp1=sequence[anchor];
+	u32 temp2=sequence[anchor+1];
+	temp1=(temp1<<32)+temp2;
+	i32 overloop=((anchor+2)<<5)-position-num;
+	return (temp1>>overloop)&((1<<num)-1);
+}
+
+
+i32 * Phi::getPhiArray(){
+	i32 * phiarray = new i32[n];
+	memset(phiarray,0,sizeof(i32)*n);
+	i32 i=0;
+	i32 method=0;
+	i32 base=0;
+	//i32 soffset=0;
+	//i32 offset=0;
+	i32 position=0;
+	i32 value=0;
+	for(i=0;i<n;i++){
+		if(i%b==0){
+			base=samples->GetValue(i/b);
+			method=methods->GetValue(i/b);
+			phiarray[i]=base;
+			continue;
+		}
+		switch(method){
+			case 0:decodeGamma(position,value);
+				   base=(base+value)%n;
+				   phiarray[i]=base;
+				   break;
+			case 1:decodeGamma(position,value);
+				   if(value%2==0){
+					   i32 num=value/2;
+					   for(i32 j=0;j<num;j++){
+						   base=(base+1)%n;
+						   phiarray[i+j]=base;
+					   }
+					   i=i+num-1;
+				   }
+				   else{
+					   value=(value+3)/2;
+					   base=(base+value)%n;
+					   phiarray[i]=base;;
+				   };
+				   break;
+			case 2:i32 ones=b-1;
+				   for(i32 j=0;j<ones;j++){
+					   base=(base+1)%n;
+					   phiarray[i+j]=base;
+				   };
+				   i=i+ones-1;
+				   break;
+			//default:cerr<<"method error"<<endl;break;
+		}
+	}
+	return phiarray;
+}
+
+
 
 
 
