@@ -79,6 +79,14 @@ class Phi
 		i32 rlgSequence(i32 position,i32 base,i32 num);
 		i32 all1Sequence(i32 position,i32 base,i32 num);
 
+		i32 leftBoundary_gamma(i32 b,i32 l,i32 r,i32 pl);
+		i32 leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl);
+		i32 leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl);
+
+		i32 rightBoundary_gamma(i32 b,i32 ans);
+		i32 rightBoundary_rlg(i32 b,i32 ans);
+		i32 rightBoundary_all1(i32 b,i32 ans);
+
 		/*以下函数位验证正确性只用。
 		*/
 		void MethodsStatic();

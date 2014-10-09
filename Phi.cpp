@@ -381,7 +381,137 @@ i32 Phi::all1Sequence(i32 position,i32 base,i32 num){
 	return (base+num)%n;
 }
 
+/*在区间[L,R]内，找到第一个Phi值大于等于l的
+ */
+i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
+	//return 0;
+	//i32 ans=0;
+	//i32 SL=a;
+	i32 L=b;
+	i32 lb=(l+L-1)/L;
+	i32 rb=r/L;
+	i32 b=rb+1;
+	i32 m=0;
+	i32 x=0;
+	while(lb<=rb){
+		m=(lb+rb)>>1;
+		x=samples->GetValue(m);
+		if(x==pl){
+			b=m;
+			break;
+		}
+		if(x>pl){
+			b=m;
+			rb=m-1;
+		}
+		else
+			lb=m+1;
+	}
+	if(b==0)
+		return 0;
+	//x=samples->GetValue(b-1);
+	//if(r>b*L-1)
+	//	r=b*L-1;
+	//ans=r+1;
+	i32 method = methods->GetValue(b-1);
+	switch(method){
+		case 0:return leftBoundary_gamma(b,l,r,pl);
+		case 1:return leftBoundary_rlg(b,l,r,pl);
+		case 2:return leftBoundary_all1(b,l,r,pl);
+		default :cerr<<"method erroe"<<endl;exit(0);
+	}
+}
 
+i32 Phi::leftBoundary_gamma(i32 b,i32 l,i32 r,i32 pl){
+	//return 0;
+	i32 ans=0;
+	i32 m=0;
+	i32 SL=a;
+	i32 L=this->b;
+	i32 x=samples->GetValue(b-1);
+	if(r>b*L-1)
+		r=b*L-1;
+	ans=r+1;
+	m=(b-1)*L;
+	i32 position=superoffset[m/SL]+offset->GetValue(b-1);
+	i32 d=0;
+	while(m<l){
+		decodeGamma(position,d);
+		x=(x+d)%n;
+		m++;
+	}
+	while(1){
+		if(x>=pl){
+			ans=m;
+			break;
+		}
+		m++;
+		if(m>r)
+			break;
+		decodeGamma(position,d);
+		x=(x+d)%n;
+	}
+	return ans;
+}
+
+i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
+	//return 0;
+	i32 m=0;
+	i32 run=0;
+	i32 ans=0;
+	i32 SL=a;
+	i32 L=this->b;
+	i32 x=samples->GetValue(b-1);
+	if(r>b*L-1)
+		r=b*L-1;
+	ans=r+1;
+	m=(b-1)*L;
+	i32 position=superoffset[m/SL]+offset->GetValue(b-1);
+	i32 d=0;
+	while(1){
+		if(m>=l && x>=pl){
+			ans=m;
+			break;
+		}
+		m++;
+		if(m>r)
+			break;
+		if(run>0){
+			x=(x+1)%n;
+			run--;
+		}
+		else{
+			decodeGamma(position,d);
+			if(d%2==0){
+				run=d/2-1;
+				x=(x+1)%n;
+			}
+			else
+				x=(x+(d+3)/2)%n;
+		}
+	}
+	return ans;
+}
+
+i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
+	//return 0;
+	i32 m=0;
+	i32 ans=0;
+	i32 L=this->b;
+	if(r>b*L-1)
+		r=b*L-1;
+	ans=r+1;
+	i32 x=samples->GetValue(b-1);
+	m=(b-1)*L;
+	if(pl-x<L)
+		return m+(pl-x);
+	return ans;
+}
+/*在区间[L,R]内，找到最后一个Phi值小于等于l的
+ */
+i32 Phi::rightBoundary(i32 l,i32 L,i32 R){
+	return 0;
+}
 
 
 
