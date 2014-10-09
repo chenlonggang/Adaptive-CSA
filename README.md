@@ -86,4 +86,5 @@
 			   the sampled anchors,and then decode a block,the costs on binary search
 			   and sequence-decode diffs not very much,so decoding from right or left
 			   side will not help a lot,so,forget it!  
-	2014.10.9: getValue for Phi is OK now...
+	2014.10.9: getValue for Phi is OK now...  
+	2014.10.9: leftBoundary is finshed,but is right? 
