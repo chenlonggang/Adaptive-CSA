@@ -409,10 +409,6 @@ i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 	}
 	if(b==0)
 		return 0;
-	//x=samples->GetValue(b-1);
-	//if(r>b*L-1)
-	//	r=b*L-1;
-	//ans=r+1;
 	i32 method = methods->GetValue(b-1);
 	switch(method){
 		case 0:return leftBoundary_gamma(b,l,r,pl);
@@ -423,7 +419,6 @@ i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 }
 
 i32 Phi::leftBoundary_gamma(i32 b,i32 l,i32 r,i32 pl){
-	//return 0;
 	i32 ans=0;
 	i32 m=0;
 	i32 SL=a;
@@ -503,18 +498,151 @@ i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
 	ans=r+1;
 	i32 x=samples->GetValue(b-1);
 	m=(b-1)*L;
-	if(pl-x<L)
-		return m+(pl-x);
+	i32 run=L-1;
+	while(1){
+		if(m>=l && x>=pl){
+			ans=m;
+			break;
+		}
+		m++;
+		if(m>r)
+			break;
+		if(run>0){
+			x=(x+1)%n;
+			run--;
+		}
+	}
 	return ans;
 }
 /*在区间[L,R]内，找到最后一个Phi值小于等于l的
  */
-i32 Phi::rightBoundary(i32 l,i32 L,i32 R){
-	return 0;
+i32 Phi::rightBoundary(i32 pr,i32 l,i32 r){
+	i32 L=this->b;
+	i32 lb=(l+L-1)/L;
+	i32 rb=r/L;
+	i32 b=lb-1;
+	i32 m=0;
+	i32 x=0;
+	while(lb<=rb){
+		m=(lb+rb)>>1;
+		x=samples->GetValue(m);
+		if(x==pr){
+			b=m;
+			break;
+		}
+		if(x<pr){
+			b=m;
+			lb=m+1;
+		}
+		else
+			rb=m-1;
+	}
+	//if(b==0)
+	//	return 0;
+	i32 method=methods->GetValue(b);
+	switch(method){
+		case 0:return rightBoundary_gamma(b,l,r,pr);
+		case 1:return rightBoundary_rlg(b,l,r,pr);
+		case 2:return rightBoundary_all1(b,l,r,pr);
+		default:cerr<<"method error"<<endl;exit(0);
+	}
 }
 
+i32 Phi::rightBoundary_gamma(i32 b,i32 l,i32 r,i32 pr){
+	i32 m=0;
+	i32 L=this->b;
+	i32 SL=this->a;
+	i32 x=samples->GetValue(b);
+	
+	i32 ans=l-1;
+	
+	if(r>(b+1)*L-1)
+		r=(b+1)*L-1;
+	m=b*L;
+	i32 d=0;
+	i32 position = superoffset[m/SL]+offset->GetValue(m/L);
+	while(m<l){
+		decodeGamma(position,d);
+		x=(x+d)%n;
+		m++;
+	}
 
+	while(1){
+		if(x>pr)
+			break;
+		ans=m;
+		m++;
+		if(m>r)
+			break;
+		decodeGamma(position,d);
+		x=(x+d)%n;
+	}
+	return ans;
+}
 
+i32 Phi::rightBoundary_rlg(i32 b,i32 l,i32 r,i32 pr){
+	i32 m=0;
+	i32 L=this->b;
+	i32 SL=this->a;
+	i32 x=samples->GetValue(b);
+
+	i32 ans=l-1;
+	if(r>(b+1)*L-1)
+		r=(b+1)*L-1;
+	m=b*L;
+	i32 d=0;
+	i32 position = superoffset[m/SL]+offset->GetValue(m/L);
+	
+	i32 run=0;
+	while(1){
+		if(m>=l && x>pr)
+			break;
+		ans=m;
+		m++;
+		if(m>r)
+			break;
+		if(run>0){
+			x=(x+1)%n;
+			run--;
+		}
+		else{
+			decodeGamma(position,d);
+			if(d%2==0){
+				run=d/2-1;
+				x=(x+1)%n;
+			}
+			else
+				x=(x+(d+3)/2)%n;
+		}
+	}
+	return ans;
+}
+
+i32 Phi::rightBoundary_all1(i32 b,i32 l,i32 r,i32 pr){
+	i32 L=this->b;
+	i32 m=0;
+	i32 ans=l-1;
+	if(r>(b+1)*L-1)
+		r=(b+1)*L-1;
+
+	i32 x=samples->GetValue(b);
+	m=b*L;
+	i32 run=L-1;
+	while(1){
+		if(m>=l && x>pr)
+			break;
+		ans=m;
+		m++;
+		if(m>r)
+			break;
+		if(run>0){
+			x=(x+1)%n;
+			run--;
+		}
+	}
+	return ans;
+
+}
 
 
 
