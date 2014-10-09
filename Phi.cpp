@@ -454,7 +454,7 @@ i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
 	i32 m=0;
 	i32 run=0;
 	i32 ans=0;
-	i32 SL=a;
+	i32 SL=this->a;
 	i32 L=this->b;
 	i32 x=samples->GetValue(b-1);
 	if(r>b*L-1)
