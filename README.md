@@ -80,4 +80,9 @@
 	2014.10.8: Save and Load function for CSA is OK.Phi class is on the way.
 	           I design three code/decode mehod:three are:pure-gamma,rl+gamma,ALL1,
 			   both are good at different situations.  
-	2014.10.8: code Phi array using three methods,it seems right...
+	2014.10.8: code Phi array using three methods,it seems right...  
+	2014.10.9: I am sure that code is right. leftboundary and rightboundary function
+	           are on the way. For the backward search, first do a binary search on 
+			   the sampled anchors,and then decode a block,the costs on binary search
+			   and sequence-decode diffs not very much,so decoding from right or left
+			   side will not help a lot,so,forget it!
