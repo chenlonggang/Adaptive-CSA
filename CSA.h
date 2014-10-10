@@ -33,6 +33,8 @@ class CSA
 		i32 getAlphabetSize();
 		i32 sizeInByte();
 		i32 sizeInByteForCount();
+		double compressRatio();
+		double compressRatioForCount();
 	private:
 		CSA_Handler ct;
 };

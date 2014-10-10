@@ -31,6 +31,13 @@ i32 CSA::sizeInByteForCount(){
 	return ct.sizeInByteForCount();
 }
 
+double CSA::compressRatio(){
+	return sizeInByte()/(getN()*1.0);
+}
+
+double CSA::compressRatioForCount(){
+	return sizeInByteForCount()/(getN()*1.0);
+}
 i32 CSA::Save(const char * indexfile){
 	savekit s(indexfile);
 	s.writeu64(198809102510);
