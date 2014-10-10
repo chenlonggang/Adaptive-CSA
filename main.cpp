@@ -11,6 +11,7 @@ int main(){
 	c=csa;
 	c.Counting("the",counts);
 	cout<<counts<<endl;
-	
+
+//	cout<<6%3<<endl;
 	return 0;
 }

@@ -45,8 +45,10 @@ class CSA_Handler
 
 		//返回SA[sa]
 		i32 lookUp(i32 sa);
-		//Counting的实现
+		//Counting的实现，采用直接的二分办法
 		void countSearch(const char * pattern,i32 &L,i32 &R);
+		//Counting的实现，先在采样点上二分，然后在具体的block内二分
+		void countSearch2(const char * pattern,i32 &L,i32 &R);
 
 		//读取文件，初始化各种表。
 		uchar * getFile(const char * filename);

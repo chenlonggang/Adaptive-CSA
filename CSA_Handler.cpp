@@ -13,6 +13,10 @@ the Free Software Foundation; either version 2 or later of the License.
 #include"CSA_Handler.h"
 #include<string.h>
 CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u(){
+	if(speedlevel<0)
+		speedlevel=0;
+	if(speedlevel>2)
+		speedlevel=2;
 	this->speedlevel=speedlevel;
 	this->SL=L*18;
 	this->L=L;
@@ -81,6 +85,7 @@ void CSA_Handler::assignDataMembers(const CSA_Handler & h){
 	phi=h.phi;
 	speedlevel=h.speedlevel;
 }
+
 void CSA_Handler::deletePointers(){
 	if(SAL)	  delete SAL;
 	if(RankL) delete RankL;
@@ -92,6 +97,7 @@ void CSA_Handler::deletePointers(){
 	phi=NULL;
 	code=incode=start=NULL;
 }
+
 void CSA_Handler::computerPar(i32 * phi){
 	//计算gap中1的比例，依次决定参数 
 	i32 pre=0;
@@ -106,33 +112,20 @@ void CSA_Handler::computerPar(i32 * phi){
 	}
 	double ratio = (num*1.0)/n;
 	i32 multi=1;
-	if(speedlevel==0)
-	{
-		if(ratio<0.2)
-			multi=1;
-		else if(ratio<0.4)
-			multi=2;
-		else
-			multi=4;
+	double ratio1=0.0;
+	double ratio2=0.0;
+	switch(speedlevel){
+		case 0:ratio1=0.2;ratio2=0.4;break;
+		case 1:ratio1=0.3;ratio2=0.5;break;
+		case 2:ratio1=0.5;ratio2=0.7;break;
 	}
-	if(speedlevel==1)
-	{
-		if(ratio<0.3)
-			multi=1;
-		else if(ratio<0.5)
-			multi=2;
-		else
-			multi=4;
-	}
-	if(speedlevel==2)
-	{
-		if(ratio<0.5)
-			multi=1;
-		else if(ratio<0.7)
-			multi=2;
-		else
-			multi=4;
-	}
+	if(ratio<ratio1)
+		multi=1;
+	else if(ratio<ratio2)
+		multi=2;
+	else 
+		multi=4;
+
 	this->L=this->L*multi;
 	this->SL=this->L*18;
 	this->D=this->D*multi;
@@ -247,7 +240,7 @@ void CSA_Handler::statics(uchar *T){
 void CSA_Handler::Counting(const char * pattern,i32 &num){
 	i32 L=0;
 	i32 R=0;
-	countSearch(pattern,L,R);
+	countSearch2(pattern,L,R);
 	num=R-L+1;
 }
 
@@ -264,7 +257,7 @@ i32 CSA_Handler::lookUp(i32 i){
 void CSA_Handler::Locating(const char * pattern,i32 &num,i32 *&pos){
 	i32 L=0;
 	i32 R=0;
-	this->countSearch(pattern,L,R);
+	this->countSearch2(pattern,L,R);
 	num=R-L+1;
 	if(L>R)
 		return ;
@@ -316,6 +309,51 @@ void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence){
 		sequence[j]=character(k);
 		start=phi->getValue(start);
 	}
+}
+
+void CSA_Handler::countSearch2(const char * pattern,i32 &L,i32 &R){
+	i32 len=strlen(pattern);
+	if(len==0){
+		L=1;
+		R=0;
+		return;
+	}
+	uchar c=pattern[len-1];
+	i32 coding=code[c];
+	if(coding<0 || coding >alphabetsize-1){
+		L=1;
+		R=0;
+		return ;
+	}
+
+	i32 Left=start[coding];
+	i32 Right=start[coding+1]-1;
+	i32 l0=0;
+	i32 r0=0;
+
+	for(i32 i=len-2;i>=0;i--){
+		c=pattern[i];
+		coding=code[c];
+		if(coding<0){
+			Left=1;
+			Right=0;
+			break;
+		}
+		l0=start[coding];
+		if(coding==code[lastchar])
+			l0=l0+1;
+		r0=start[coding+1]-1;
+		Right=phi->rightBoundary(Right,l0,r0);
+		Left =phi->leftBoundary(Left,l0,r0);
+		if(Left>Right){
+			Left=1;
+			Right=0;
+			break;
+		}
+	}
+	L=Left;
+	R=Right;
+	return ;
 }
 
 void CSA_Handler::countSearch(const char * pattern,i32 &L,i32 &R){
