@@ -17,7 +17,7 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	this->b=bs;
 	this->a=18*b;
 	this->index=0;
-	
+//	cout<<"phi:20 "<<a<<" "<<b<<endl;	
 	value=new i32[n];
 	memcpy(value,phiarray,n*sizeof(i32));
 	/*
@@ -86,9 +86,12 @@ i32 Phi::blogsize(i32 x){
 	return len;
 }
 
-/*
-   计算编码方法和所需的空间.
-*/
+i32 Phi::sizeInByte(){
+	i32 part1=methods->GetMemorySize()+offset->GetMemorySize()+samples->GetMemorySize();
+	i32 part2=lenofsuperoffset*sizeof(i32)+lenofsequence*sizeof(u32);
+	return part1+part2;
+}
+
 void Phi::methodsAndSpace(){
 	i32 totlen=0;  //总长度 
 	i32 len=0;     //某个超快的编码长度
@@ -107,6 +110,8 @@ void Phi::methodsAndSpace(){
 			
 			if(j%b==0){
 				pre=value[i];
+				rlg=0;
+				g=0;
 				continue;
 			}
 			

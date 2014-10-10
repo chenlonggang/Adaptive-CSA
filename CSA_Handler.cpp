@@ -52,7 +52,7 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u()
 	//phiArray:Phi数组
 	//n:Phi数组长度
 	//L:块大小，超快大小固定位块大小的18倍,不用传.
-	phi = new Phi(phiarray,n,L);
+	phi = new Phi(phiarray,n,this->L);
 	
 	delete [] phiarray;
 	phiarray=NULL;
@@ -125,11 +125,10 @@ void CSA_Handler::computerPar(i32 * phi){
 		multi=2;
 	else 
 		multi=4;
-
 	this->L=this->L*multi;
 	this->SL=this->L*18;
-	this->D=this->D*multi;
-	this->RD=this->D*16;
+//	this->D=this->D*multi;
+//	this->RD=this->D*16;
 }
 
 void CSA_Handler::sampleSAAndRank(i32 * SA){
@@ -454,11 +453,17 @@ i32 CSA_Handler::getN(){
 }
 
 i32 CSA_Handler::sizeInByte(){
-	return 0;
+	//	return 0;
+	i32 part1=0;//7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
+	i32 part2=SAL->GetMemorySize()+RankL->GetMemorySize()+phi->sizeInByte();
+	return part1+part2;
 }
 
 i32 CSA_Handler::sizeInByteForCount(){
-	return 0;
+	//return 0;
+	i32 part1=0;//7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
+	i32 part2=phi->sizeInByte();
+	return part1+part2;
 }
 
 i32 CSA_Handler::blog(i32 x){

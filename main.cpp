@@ -13,5 +13,9 @@ int main(){
 	cout<<counts<<endl;
 
 //	cout<<6%3<<endl;
+	i32 n= csa.getN();
+	i32 size=csa.sizeInByte();
+	cout<<(size*1.0)/n<<endl;
+	cout<<(csa.sizeInByteForCount()*1.0)/n<<endl;
 	return 0;
 }
