@@ -90,4 +90,5 @@
 	2014.10.9: Boundary function is finshed,but is right?  
 	2014.10.10:Boundary function seems right,because countSearch2 seems right.
 	           next we need compare the results of counfSearch and countSearch2.
-			   countSearch is a baseline,it's absolutely right!
+			   countSearch is a baseline,it's absolutely right!  
+	2014.10.10:The size function is ok,it seems right.
