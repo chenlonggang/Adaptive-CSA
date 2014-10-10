@@ -87,4 +87,7 @@
 			   and sequence-decode diffs not very much,so decoding from right or left
 			   side will not help a lot,so,forget it!  
 	2014.10.9: getValue for Phi is OK now...  
-	2014.10.9: Boundary function is finshed,but is right? 
+	2014.10.9: Boundary function is finshed,but is right?  
+	2014.10.10:Boundary function seems right,because countSearch2 seems right.
+	           next we need compare the results of counfSearch and countSearch2.
+			   countSearch is a baseline,it's absolutely right!
