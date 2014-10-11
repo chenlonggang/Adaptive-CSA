@@ -93,4 +93,6 @@
 			   countSearch is a baseline,it's absolutely right!  
 	2014.10.10:The size function is ok,it seems right.And add compressRatio function  
 	2014.10.11:EveryThing seems right now. For highlyrepetive data,the block size 
-	           is bigger,it is good to speed,and do little harm to query's speed.
+	           is bigger,it is good to speed,and do little harm to query's speed.  
+	2014.10.11:Adjust the threshold,so the block-size is more reasonable.This work 
+	           is closed temporary,goodbye!
