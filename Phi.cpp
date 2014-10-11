@@ -12,25 +12,30 @@ the Free Software Foundation; either version 2 or later of the License.
 #include"Phi.h"
 #include<iostream>
 using namespace std;
+
 Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	this->n=n;
 	this->b=bs;
 	this->a=18*b;
 	this->index=0;
-//	cout<<"phi:20 "<<a<<" "<<b<<endl;	
+	/*
 	value=new i32[n];
 	memcpy(value,phiarray,n*sizeof(i32));
-	/*
-	value=phiarray;
 	*/
+	
+	value=phiarray;
+	
 	methodsAndSpace();
 	allocAndInit();
 	initZeroTable();
 	codeAndFill();
 
-	//MethodsStatic();
-	//cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
-	//cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
+	/*
+	MethodsStatic();
+	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
+	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
+	*/
+	value=NULL;
 }
 
 bool Phi::checkCodeAndFill_getPhiArray(){
@@ -51,6 +56,7 @@ void Phi::MethodsStatic(){
 	cout<<"rlg:   "<<x[1]<<endl;
 	cout<<"ALL0:  "<<x[2]<<endl;
 }
+
 Phi::~Phi(){
 	if(superoffset)	delete [] superoffset;
 	if(samples)     delete samples;
