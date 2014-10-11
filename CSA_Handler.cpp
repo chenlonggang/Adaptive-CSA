@@ -121,9 +121,9 @@ void CSA_Handler::computerPar(i32 * phi){
 	double ratio1=0.0;
 	double ratio2=0.0;
 	switch(speedlevel){
-		case 0:ratio1=0.2;ratio2=0.4;break;
-		case 1:ratio1=0.3;ratio2=0.5;break;
-		case 2:ratio1=0.5;ratio2=0.7;break;
+		case 0:ratio1=0.50;ratio2=0.60;break;
+		case 1:ratio1=0.60;ratio2=0.75;break;
+		case 2:ratio1=0.65;ratio2=0.80;break;
 	}
 	if(ratio<ratio1)
 		multi=1;
@@ -133,6 +133,7 @@ void CSA_Handler::computerPar(i32 * phi){
 		multi=4;
 	this->L=this->L*multi;
 	this->SL=this->L*18;
+	cout<<"CSA_Handler--136: multi:  "<<multi<<endl;
 //	this->D=this->D*multi;
 //	this->RD=this->D*16;
 }

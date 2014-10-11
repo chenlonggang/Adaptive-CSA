@@ -2,6 +2,7 @@
 #include"CSA.h"
 using namespace std;
 int main(){
+	
 	CSA csa("bible");
 	int num;
 	csa.counting("the",num);
@@ -36,5 +37,13 @@ int main(){
 	csa3.locating("the",num,pos);
 	for(i32 i=0;i<10 && i<num;i++)
 		cout<<pos[i]<<endl;
+
+/*
+	CSA csa("bible");
+	uchar *p=NULL;
+	int n=csa.getN();
+	csa.extracting(0,n,p);
+	cout<<p<<endl;
 	return 0;
+*/
 }
