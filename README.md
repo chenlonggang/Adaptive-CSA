@@ -91,4 +91,6 @@
 	2014.10.10:Boundary function seems right,because countSearch2 seems right.
 	           next we need compare the results of counfSearch and countSearch2.
 			   countSearch is a baseline,it's absolutely right!  
-	2014.10.10:The size function is ok,it seems right.And add compressRatio function
+	2014.10.10:The size function is ok,it seems right.And add compressRatio function  
+	2014.10.11:EveryThing seems right now. For highlyrepetive data,the block size 
+	           is bigger,it is good to speed,and do little harm to query's speed.
