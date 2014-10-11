@@ -76,6 +76,12 @@ CSA_Handler::~CSA_Handler(){
 }
 
 void CSA_Handler::assignDataMembers(const CSA_Handler & h){
+	SL=h.SL;
+	L=h.L;
+	D=h.D;
+	RD=h.RD;
+	SAL=h.SAL;
+	RankL=h.RankL;
 	n=h.n;
 	code=h.code;
 	incode=h.incode;
@@ -214,7 +220,7 @@ void CSA_Handler::statics(uchar *T){
 	this->start[alphabetsize]=n;
 	this->start[0]=0;
 	i32 k=1;
-	i32 pre=1;
+	i32 pre=0;
 
 	for(i32 i=0;i<256;i++)
 		if(code[i]!=0){
@@ -300,9 +306,10 @@ void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence){
 		sequence=NULL;
 		exit(0);
 	}
-	sequence = new uchar[len];
-	memset(sequence,0,len*sizeof(uchar));
+	sequence = new uchar[len+1];
+	memset(sequence,0,(len+1)*sizeof(uchar));
 	i32 k=0;
+	start=inverse(start);
 	for(i32 j=0;j<len;j++){
 		k=phiList(start);
 		sequence[j]=character(k);

@@ -69,13 +69,55 @@ i32 Phi::getValue(const i32 index){
 	return value[index];
 }
 */
-i32 Phi::load(loadkit & h){
+i32 Phi::write(savekit & s){
+	s.writei32(n);
+	s.writei32(a);
+	s.writei32(b);
+	//s.writei32(alphabetsize);
+	//superoffset
+	s.writei32(lenofsuperoffset);
+	s.writei32array(superoffset,lenofsuperoffset);
+	//offset
+	offset->write(s);
+	//samples
+	samples->write(s);
+	//sequence
+	s.writei32(lenofsequence);
+	s.writeu32array(sequence,lenofsequence);
+	//methods
+	methods->write(s);
 	return 0;
 }
 
-i32 Phi::write(savekit & h){
+i32 Phi::load(loadkit & s){
+	s.loadi32(n);
+	s.loadi32(a);
+	s.loadi32(b);
+	//s.loadi32(alphabetsize);
+	//zeroatable
+	this->zerostable=new u16[1<<16];
+	this->initZeroTable();
+	//superoffset
+	s.loadi32(lenofsuperoffset);
+	superoffset=new i32[lenofsuperoffset];
+	s.loadi32array(superoffset,lenofsuperoffset);
+	//offset
+	offset=new InArray();
+	offset->load(s);
+	//samples
+	samples=new InArray();
+	samples->load(s);
+	//sequence
+	s.loadi32(lenofsequence);
+	sequence = new u32[lenofsequence];
+	s.loadu32array(sequence,lenofsequence);
+	//methods
+	methods=new InArray();
+	methods->load(s);
 	return 0;
 }
+
+
 
 i32 Phi::blogsize(i32 x){
 	i32 len=0;

@@ -38,7 +38,7 @@ double CSA::compressRatio(){
 double CSA::compressRatioForCount(){
 	return sizeInByteForCount()/(getN()*1.0);
 }
-i32 CSA::Save(const char * indexfile){
+i32 CSA::save(const char * indexfile){
 	savekit s(indexfile);
 	s.writeu64(198809102510);
 	ct.Save(s);
@@ -46,11 +46,11 @@ i32 CSA::Save(const char * indexfile){
 	return 0;
 }
 
-i32 CSA::Load(const char * indexfile){
+i32 CSA::load(const char * indexfile){
 	loadkit s(indexfile);
 	u64 magicnum=0;
 	s.loadu64(magicnum);
-	if(magicnum==198809102510){
+	if(magicnum!=198809102510){
 		cerr<<"Not a CSA_index file"<<endl;
 		exit(0);
 	}
@@ -59,15 +59,15 @@ i32 CSA::Load(const char * indexfile){
 	return 0;
 }
 
-void CSA::Counting(const char * pattern,i32 &num){
+void CSA::counting(const char * pattern,i32 &num){
 	ct.Counting(pattern,num);
 }
 
-void CSA::Locating(const char * pattern,i32  &num,int *&pos){
+void CSA::locating(const char * pattern,i32  &num,int *&pos){
 	ct.Locating(pattern,num,pos);
 }
 
-void CSA::Extracting(i32 start,i32 len,uchar *&sequence){
+void CSA::extracting(i32 start,i32 len,uchar *&sequence){
 	ct.Extracting(start,len,sequence);
 }
 
