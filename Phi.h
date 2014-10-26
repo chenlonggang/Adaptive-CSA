@@ -44,6 +44,13 @@ class Phi
 		u32 * sequence;
 
 		u16 *zerostable;
+		
+		u16 *decodevaluenum_gam;
+		u16 *decodebitnum;
+		u16 *decoderesult_gam;
+		u16 *decodevaluenum_rlg;
+		u16 *decoderesult_rlg;
+
 		i32 n;
 		i32 a;
 		i32 b;
@@ -54,7 +61,7 @@ class Phi
 		//最大的超快的大小
 		i32 maxsbs;
 		i32 blogsize(i32 x);
-		void initZeroTable();
+		void initTables();
 
 		/*计算编码方法和总空间
 		  这个地方可以返回具体的快在

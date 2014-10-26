@@ -131,9 +131,10 @@ void CSA_Handler::computerPar(i32 * phi){
 		multi=2;
 	else 
 		multi=4;
+	multi=1;
 	this->L=this->L*multi;
 	this->SL=this->L*18;
-	cout<<"CSA_Handler--136: multi:  "<<multi<<endl;
+//  cout<<"CSA_Handler--136: multi:  "<<multi<<endl;
 //	this->D=this->D*multi;
 //	this->RD=this->D*16;
 }
@@ -357,6 +358,7 @@ void CSA_Handler::countSearch2(const char * pattern,i32 &L,i32 &R){
 			Right=0;
 			break;
 		}
+		//cout<<Left<<" "<<Right<<endl;
 	}
 	L=Left;
 	R=Right;
