@@ -95,4 +95,7 @@
 	2014.10.11:EveryThing seems right now. For highlyrepetive data,the block size 
 	           is bigger,it is good to speed,and do little harm to query's speed.  
 	2014.10.11:Adjust the threshold,so the block-size is more reasonable.This work 
-	           is closed temporary,goodbye!
+	           is closed temporary,goodbye! 
+	2014.10.25:It seems that lookuptables is helpful, so use it again. And fix some
+	           bugs,about leftboundary ,rightboundary ,methodAndSpace and codeAndFill
+			   it's humiliatory that everything seems not ok until now
