@@ -101,7 +101,7 @@
 			   it's humiliatory that everything seems not ok until now  
 	2014.10.27:we can do something to make compression ratio better:
 	           Now we use run-length like this:
-			   *if* the value is a real gap, coding 2value-3 using gamma-coding.
+			   if the value is a real gap, coding 2*value-3 using gamma-coding.
 			   if the value is a 1's runs, coding 2*value using gamma-coding.
 			   the ratio of gap not equals 1 is very low, especailly for highly-repetive
 			   data, so the cost for 2*value-3 is trivial,but for 1's runs,the cost is
