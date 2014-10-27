@@ -101,7 +101,6 @@
 			   it's humiliatory that everything seems not ok until now  
 	2014.10.27:we can do something to make compression ratio better:
 	           Now we use run-length like this:
-			   
 			   if the value is a real gap, coding 2*value-3 using gamma-coding.
 			   if the value is a 1's runs, coding 2*value using gamma-coding.
 			   
