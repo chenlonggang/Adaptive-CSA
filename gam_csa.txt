@@ -1,4 +1,0 @@
-file:	/home/chen/code/csa/data/bible
-	build-time: 923461
-	count-time: 28.1686
-	come-ratio: 3.08535

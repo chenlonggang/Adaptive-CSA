@@ -36,11 +36,11 @@
 	{
 		CSA csa("filename");
 		int num;
-		csa.Counting(pattern,num);
+		csa.counting(pattern,num);
 		cout<<"pattern "<<pattern<<" occs "<<num<<" times"<<endl;
 
 		int *pos;
-		csa.Locating(pattern,num,pos);
+		csa.locating(pattern,num,pos);
 		cout<<"pattern "<<pattern<<" occs "<<num<<" times"<<endl;
 		cout<<"all positions are:"<<endl;
 		for(int i=0;i<num;i++)
@@ -51,7 +51,7 @@
 		char * sequence;
 		int start=0;
 		int len=20;
-		csa.Extracting(start,len,sequence);
+		csa.extracting(start,len,sequence);
 		cout<<"T[start...start+len-1] is "<<sequence<<endl;
 		//it's your duty to delete sequence;
 		delete [] sequence;
@@ -96,6 +96,34 @@
 	           is bigger,it is good to speed,and do little harm to query's speed.  
 	2014.10.11:Adjust the threshold,so the block-size is more reasonable.This work 
 	           is closed temporary,goodbye! 
-	2014.10.25:It seems that lookuptables is helpful, so use it again. And fix some
+	2014.10.26:It seems that lookuptables is helpful, so use it again. And fix some
 	           bugs,about leftboundary ,rightboundary ,methodAndSpace and codeAndFill
-			   it's humiliatory that everything seems not ok until now
+			   it's humiliatory that everything seems not ok until now  
+	2014.10.27:we can do something to make compression ratio better:
+	           Now we use run-length like this:
+			   
+			   if the value is a real gap, coding 2*value-3 using gamma-coding.
+			   if the value is a 1's runs, coding 2*value using gamma-coding.
+			   
+			   the ratio of gap not equals 1 is very low, especailly for highly-repetive
+			   data, so the cost for 2*value-3 is trivial,but for 1's runs,the cost is
+			   a littler high, especially for english-like and highly-repetive data,
+			   there are many runs in these datas,so if we do like this,the cost will 
+			   be smaller:
+
+			   if the value is a real gap, the coding value is 2*value-1 now;
+			   if the value is a runs,the coding value is 2*value, same as before.
+
+			   because the low ratio,the change of real gap is trivial.
+			   what important is: now all the coding value is >1,at least is 2,
+			   for the gamma-coding,the 0's num  preceding the binary-bits of the 
+			   value is at least 1, so we can change the gamma-coding's rule:
+			   
+			   if the binary-bits's length is x,we append x-2 0s on the head,
+			   now we will save 1 bit for every single value, compare with the 
+			   original mapping method, the real gap will cost 1 bit more at most
+			   time,but for the 1's runs, 1 bit will saved, so it will be helpful 
+			   for highly-repetive data.
+			   working on it now!
+
+
