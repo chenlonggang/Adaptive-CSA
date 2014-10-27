@@ -26,7 +26,7 @@
 	step 1:download or clone it
 	step 2:make
 	step 3:include CSA.h
-	step 4:g++ your_program.cpp -o xx -csa.a
+	step 4:g++ your_program.cpp -o xx csa.a
 ###example
 	```cpp
 	#include"CSA.h"
