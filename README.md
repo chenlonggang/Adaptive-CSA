@@ -57,9 +57,9 @@
 		delete [] sequence;
 		sequence =NULL;
 		
-		csa.Save("index.csa");
+		csa.save("index.csa");
 		CSA csa2;
-		csa2.Load("index.csa");
+		csa2.load("index.csa");
 
 		return 0;
 	}
