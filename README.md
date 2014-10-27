@@ -101,29 +101,24 @@
 			   it's humiliatory that everything seems not ok until now  
 	2014.10.27:we can do something to make compression ratio better:
 	           Now we use run-length like this:
-			   
-			   if the value is a real gap, coding 2*value-3 using gamma-coding.
-			   if the value is a 1's runs, coding 2*value using gamma-coding.
-			   
+			   _if the value is a real gap, coding 2*value-3 using gamma-coding._
+			   _if the value is a 1's runs, coding 2*value using gamma-coding._
 			   the ratio of gap not equals 1 is very low, especailly for highly-repetive
 			   data, so the cost for 2*value-3 is trivial,but for 1's runs,the cost is
 			   a littler high, especially for english-like and highly-repetive data,
 			   there are many runs in these datas,so if we do like this,the cost will 
 			   be smaller:
-
-			   if the value is a real gap, the coding value is 2*value-1 now;
-			   if the value is a runs,the coding value is 2*value, same as before.
-
+			   _if the value is a real gap, the coding value is 2*value-1 now;_
+			   _if the value is a runs,the coding value is 2*value, same as before._
 			   because the low ratio,the change of real gap is trivial.
 			   what important is: now all the coding value is >1,at least is 2,
 			   for the gamma-coding,the 0's num  preceding the binary-bits of the 
 			   value is at least 1, so we can change the gamma-coding's rule:
-			   
-			   if the binary-bits's length is x,we append x-2 0s on the head,
+			   _if the binary-bits's length is x,we append x-2 0s on the head,_
 			   now we will save 1 bit for every single value, compare with the 
 			   original mapping method, the real gap will cost 1 bit more at most
-			   time,but for the 1's runs, 1 bit will saved, so it will be helpful 
-			   for highly-repetive data.
+			   time,but for the 1's runs, 1 bit will saved. 
+			   _so it will be helpful for highly-repetive data._
 			   working on it now!
 
 
