@@ -119,6 +119,6 @@
 			   original mapping method, the real gap will cost 1 bit more at most
 			   time,but for the 1's runs, 1 bit will saved. 
 			   so it will be helpful for highly-repetive data.
-			   working on it now!
+			   working on it now! In fact u8 for lookuptables is enough, fix it!
 
 
