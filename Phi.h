@@ -46,9 +46,10 @@ class Phi
 		u16 *zerostable;
 		
 		u16 *decodevaluenum_gam;
-		u16 *decodebitnum;
+		u16 *decodebitnum_gam;
 		u16 *decoderesult_gam;
 		u16 *decodevaluenum_rlg;
+		u16 *decodebitnum_rlg;
 		u16 *decoderesult_rlg;
 
 		i32 n;
@@ -79,6 +80,9 @@ class Phi
 		void codeAndFill();
 		void Append(i32 x);
 		i32 decodeGamma(i32 &position,i32 &value);
+		void Append_rlg(i32 x);
+		i32 decodeGamma_rlg(i32 & position,i32 &value);
+
 		i32 zeroRun(i32 &position);
 		i32 getBits(i32 position,i32 bits);
 

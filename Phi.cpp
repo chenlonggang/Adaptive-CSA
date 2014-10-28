@@ -18,10 +18,6 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	this->b=bs;
 	this->a=18*b;
 	this->index=0;
-	/*
-	value=new i32[n];
-	memcpy(value,phiarray,n*sizeof(i32));
-	*/
 	
 	value=phiarray;
 	
@@ -31,10 +27,10 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	codeAndFill();
 
 	
-/*	MethodsStatic();
-	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
-	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
-*/	
+//	MethodsStatic();
+//	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
+//	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
+	
 	value=NULL;
 }
 
@@ -64,22 +60,22 @@ Phi::~Phi(){
 	if(sequence)    delete [] sequence;
 	if(zerostable)  delete [] zerostable;
 	if(decodevaluenum_gam) delete [] decodevaluenum_gam;
-	if(decodebitnum)       delete [] decodebitnum;
+	if(decodebitnum_gam)   delete [] decodebitnum_gam;
 	if(decoderesult_gam)   delete [] decoderesult_gam;
 	if(decodevaluenum_rlg) delete [] decodevaluenum_rlg;
+	if(decodebitnum_rlg)   delete [] decodebitnum_rlg;
 	if(decoderesult_rlg)   delete [] decoderesult_rlg;
 	
 	samples=offset=NULL;
 	superoffset=NULL;
 	sequence=NULL;
 	zerostable=NULL;
+	decodevaluenum_gam=decodebitnum_gam=decoderesult_gam=NULL;
+	decodevaluenum_rlg=decodebitnum_rlg=decoderesult_rlg=NULL;
 
 }
-/*
-i32 Phi::getValue(const i32 index){
-	return value[index];
-}
-*/
+
+
 i32 Phi::write(savekit & s){
 	s.writei32(n);
 	s.writei32(a);
@@ -171,20 +167,21 @@ void Phi::methodsAndSpace(){
 			gap=value[j]-pre;
 			if(gap<0)
 				gap=gap+n;
+			//cout<<gap<<endl;
 			g=g+2*blogsize(gap)-1;
 			if(gap==1)
 				runs++;
 			else{
 				if(runs!=0)
-					rlg=rlg+2*blogsize(2*runs)-1;
-				rlg=rlg+2*blogsize(2*gap-3)-1;
+					rlg=rlg+2*blogsize(2*runs)-2;
+				rlg=rlg+2*blogsize(2*gap-1)-2;
 				runs=0;
 			}
 			pre=value[j];
 			
 			if((j+1)%b==0 || (j+1)==n){
 				if(runs >0)
-					rlg=rlg+2*blogsize(2*runs)-1;
+					rlg=rlg+2*blogsize(2*runs)-2;
 				if(runs==b-1){//ALL1
 					methods->SetValue(j/b,2);
 					len=len+0;
@@ -218,51 +215,61 @@ void Phi::initTables(){
 	}
 	zerostable[0]=D;
 	u16 * Rn_gam=this->decodevaluenum_gam;
-	u16 * Rb=this->decodebitnum;
+	u16 * Rb_gam=this->decodebitnum_gam;
 	u16 * Rx_gam=this->decoderesult_gam;
 	u16 * Rn_rlg=this->decodevaluenum_rlg;
+	u16 * Rb_rlg=this->decodebitnum_rlg;
 	u16 * Rx_rlg=this->decoderesult_rlg;
 	u32 tablesize=(1<<16);
 	u32 B[3]={0xffffffff,0xffffffff,0xffffffff};
 	u32 *temp=this->sequence;
 	this->sequence=B;
 	i32 b=0;
-	i32 num_gam=0;
-	i32 num_rlg=0;
-	i32 x_gam=0;
-	i32 x_rlg=0;
+	i32 num=0;
+	i32 x=0;
 	i32 d=0;
 	i32 preb=0;
 	for(u32 i=0;i<tablesize;i++){
 		B[0]=(i<<16);
 		b=0;
-		num_gam=0;
-		num_rlg=0;
-		x_gam=0;
-		x_rlg=0;
+		num=0;
+		x=0;
 		d=0;
 		while(1){
 			this->decodeGamma(b,d);
 			if(b>16)
 				break;
-			x_gam=x_gam+d;
-			num_gam++;
-			
+			x=x+d;
+			num++;
+			preb=b;
+		}
+		Rb_gam[i]=preb;
+		Rn_gam[i]=num;
+		Rx_gam[i]=x;
+		
+		b=0;
+		d=0;
+		num=0;
+		x=0;
+		preb=0;
+		while(1){
+			this->decodeGamma_rlg(b,d);
+			if(b>16)
+				break;
 			if(d%2==0){
-				x_rlg=x_rlg+d/2;
-				num_rlg=num_rlg+d/2;
+				x=x+d/2;
+				num=num+d/2;
 			}
 			else{
-				x_rlg=x_rlg+(d+3)/2;
-				num_rlg++;
+				x=x+(d+1)/2;
+				num++;
 			}
 			preb=b;
 		}
-		Rb[i]=preb;
-		Rn_gam[i]=num_gam;
-		Rx_gam[i]=x_gam;
-		Rn_rlg[i]=num_rlg;
-		Rx_rlg[i]=x_rlg;
+		Rn_rlg[i]=num;
+		Rx_rlg[i]=x;
+		Rb_rlg[i]=preb;
+				
 	}
 	this->sequence=temp;
 
@@ -276,16 +283,18 @@ void Phi::allocAndInit(){
 	
 	this->zerostable = new u16[1<<16];
 	this->decodevaluenum_gam=new u16[1<<16];
-	this->decodebitnum=new u16[1<<16];
+	this->decodebitnum_gam=new u16[1<<16];
 	this->decoderesult_gam =new u16[1<<16];
 	this->decodevaluenum_rlg=new u16[1<<16];
+	this->decodebitnum_rlg=new u16[1<<16];
 	this->decoderesult_rlg=new u16[1<<16];
 	
 	memset(zerostable,0,sizeof(u16)*(1<<16));
 	memset(decodevaluenum_gam,0,sizeof(u16)*(1<<16));
-	memset(decodebitnum,0,sizeof(u16)*(1<<16));
+	memset(decodebitnum_gam,0,sizeof(u16)*(1<<16));
 	memset(decoderesult_gam,0,sizeof(u16)*(1<<16));
 	memset(decodevaluenum_rlg,0,sizeof(u16)*(1<<16));
+	memset(decodebitnum_rlg,0,sizeof(u16)*(1<<16));
 	memset(decoderesult_rlg,0,sizeof(u16)*(1<<16));
 	memset(superoffset,0,sizeof(i32)*lenofsuperoffset);
 	memset(sequence,0,sizeof(u32)*lenofsequence);
@@ -329,18 +338,18 @@ void Phi::codeAndFill(){
 				   if(gap==1){
 					   runs++;
 					   if((i+1)%b==0){
-						   len1=len1+2*blogsize(2*runs)-1;
-						   Append(2*runs);
+						   len1=len1+2*blogsize(2*runs)-2;
+						   Append_rlg(2*runs);
 						   runs=0;
 					   }
 				   }
 				   else{
 					   if(runs!=0){
-						   len1=len1+2*blogsize(2*runs)-1;
-						   Append(2*runs);
+						   len1=len1+2*blogsize(2*runs)-2;
+						   Append_rlg(2*runs);
 					   }
-					   len1=len1+2*blogsize(2*gap-3)-1;
-					   Append(2*gap-3);
+					   len1=len1+2*blogsize(2*gap-1)-2;
+					   Append_rlg(2*gap-1);
 					   runs=0;
 				   };break;
 			case 2:len1=len1+0;break;
@@ -363,11 +372,32 @@ void Phi::Append(i32 x){
 	index=index+valuewidth;
 }
 
+void Phi::Append_rlg(i32 x){
+	u64 y=x;
+	i32 zeronums=blogsize(x)-2;
+	index=index+zeronums;
+	i32 valuewidth=zeronums+2;
+
+	i32 anchor=(index>>5);
+	i32 overloop =((anchor+2)<<5)-index-valuewidth;
+	y=(y<<overloop);
+	sequence[anchor]=(sequence[anchor]|(y>>32));
+	sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
+	index=index+valuewidth;
+}
+
 i32 Phi::decodeGamma(i32 & position,i32 & value){
 	i32 a=this->zeroRun(position);
 	value=getBits(position,a+1);
 	position=position+a+1;
 	return 2*a+1;
+}
+
+i32 Phi::decodeGamma_rlg(i32 & position,i32 & value){
+	i32 a=this->zeroRun(position);
+	value=getBits(position,a+2);
+	position=position+a+2;
+	return 2*a+2;
 }
 
 i32 Phi::zeroRun(i32 & position){
@@ -415,7 +445,7 @@ i32 * Phi::getPhiArray(){
 				   base=(base+value)%n;
 				   phiarray[i]=base;
 				   break;
-			case 1:decodeGamma(position,value);
+			case 1:decodeGamma_rlg(position,value);
 				   if(value%2==0){
 					   i32 num=value/2;
 					   for(i32 j=0;j<num;j++){
@@ -425,7 +455,7 @@ i32 * Phi::getPhiArray(){
 					   i=i+num-1;
 				   }
 				   else{
-					   value=(value+3)/2;
+					   value=(value+1)/2;
 					   base=(base+value)%n;
 					   phiarray[i]=base;;
 				   };
@@ -481,7 +511,7 @@ i32 Phi::rlgSequence(i32 position,i32 base,i32 num){
 	i32 i=0;
 	i32 value=0;
 	while(i<num){
-		decodeGamma(position,value);
+		decodeGamma_rlg(position,value);
 		if(value%2==0){
 			if(i+value/2>=num)
 				return (base+num-i)%n;
@@ -489,7 +519,7 @@ i32 Phi::rlgSequence(i32 position,i32 base,i32 num){
 			i=i+value/2;
 		}
 		else{
-			base=(base+(value+3)/2)%n;
+			base=(base+(value+1)/2)%n;
 			i++;
 		}
 	}
@@ -576,7 +606,7 @@ i32 Phi::leftBoundary_gamma(i32 b,i32 l,i32 r,i32 pl){
 		num=this->decodevaluenum_gam[p];
 		if(num!=0){
 			m=m+num;
-			position=position+this->decodebitnum[p];
+			position=position+this->decodebitnum_gam[p];
 			x=(x+this->decoderesult_gam[p])%n;
 		}
 		else{
@@ -588,7 +618,7 @@ i32 Phi::leftBoundary_gamma(i32 b,i32 l,i32 r,i32 pl){
 	if(loop){
 		if(num!=0){
 			x=(x-this->decoderesult_gam[p]+n)%n;
-			position=position-this->decodebitnum[p];
+			position=position-this->decodebitnum_gam[p];
 			m=m-num;
 		}
 		else{
@@ -650,7 +680,7 @@ i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
 */
 	
 	while(m<l){
-		this->decodeGamma(position,d);
+		this->decodeGamma_rlg(position,d);
 		if(d%2==0){
 			if(m+d/2>=l){
 				x=(x+d/2-(m+d/2-l))%n;
@@ -664,7 +694,7 @@ i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
 			}
 		}
 		else{
-			x=(x+(d+3)/2)%n;
+			x=(x+(d+1)/2)%n;
 			m++;
 		}
 	}
@@ -678,25 +708,25 @@ i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
 		num=this->decodevaluenum_rlg[p];
 		if(num!=0){
 			m=m+num;
-			position=position+this->decodebitnum[p];
+			position=position+this->decodebitnum_rlg[p];
 			x=(x+decoderesult_rlg[p])%n;
 		}
 		else{
-			bits=this->decodeGamma(position,d);
+			bits=this->decodeGamma_rlg(position,d);
 			if(d%2==0){
 				m=m+d/2;
 				x=x+d/2;
 			}
 			else{
 				m=m+1;
-				x=x+(d+3)/2;
+				x=x+(d+1)/2;
 			}
 		}
 	}
 	if(loop){
 		if(num!=0){
 			x=(n+x-this->decoderesult_rlg[p])%n;
-			position=position-this->decodebitnum[p];
+			position=position-this->decodebitnum_rlg[p];
 			m=m-num;
 		}
 		else{
@@ -706,7 +736,7 @@ i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
 			}
 			else{
 				m=m-1;
-				x=(n+x-(d+3)/2)%n;
+				x=(n+x-(d+1)/2)%n;
 			}
 			position =position-bits;
 		}
@@ -726,13 +756,13 @@ i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
 			run--;
 		}
 		else{
-			decodeGamma(position,d);
+			decodeGamma_rlg(position,d);
 			if(d%2==0){
 				run=d/2-1;
 				x=(x+1)%n;
 			}
 			else
-				x=(x+(d+3)/2)%n;
+				x=(x+(d+1)/2)%n;
 		}
 	}
 
@@ -845,14 +875,14 @@ i32 Phi::rightBoundary_gamma(i32 b,i32 l,i32 r,i32 pr){
 		}
 		else{
 			m=m+num;
-			position=position+this->decodebitnum[p];
+			position=position+this->decodebitnum_gam[p];
 			x=(x+this->decoderesult_gam[p])%n;
 		}
 	}
 	if(loop){
 		if(num!=0){
 			x=(n+x-this->decoderesult_gam[p])%n;
-			position=position-this->decodebitnum[p];
+			position=position-this->decodebitnum_gam[p];
 			m=m-num;
 		}
 		else{
@@ -921,26 +951,26 @@ i32 Phi::rightBoundary_rlg(i32 b,i32 l,i32 r,i32 pr){
 		p=this->getBits(position,16);
 		num=this->decodevaluenum_rlg[p];
 		if(num==0){
-			bits=decodeGamma(position,d);
+			bits=decodeGamma_rlg(position,d);
 			if(d%2==0){
 				m=m+d/2;
 				x=(x+d/2)%n;
 			}
 			else{
 				m++;
-				x=(x+(d+3)/2)%n;
+				x=(x+(d+1)/2)%n;
 			}
 		}
 		else{
 			m=m+num;
-			position=position+this->decodebitnum[p];
+			position=position+this->decodebitnum_rlg[p];
 			x=(x+this->decoderesult_rlg[p])%n;
 		}
 	}
 	if(loop){
 		if(num!=0){
 			x=(n+x-this->decoderesult_rlg[p])%n;
-			position=position-this->decodebitnum[p];
+			position=position-this->decodebitnum_rlg[p];
 			m=m-num;
 		}
 		else{
@@ -950,7 +980,7 @@ i32 Phi::rightBoundary_rlg(i32 b,i32 l,i32 r,i32 pr){
 			}
 			else{
 				m=m-1;
-				x=(n+x-(d+3)/2)%n;
+				x=(n+x-(d+1)/2)%n;
 			}
 			position=position-bits;
 		}
@@ -968,13 +998,13 @@ i32 Phi::rightBoundary_rlg(i32 b,i32 l,i32 r,i32 pr){
 			run--;
 		}
 		else{
-			decodeGamma(position,d);
+			decodeGamma_rlg(position,d);
 			if(d%2==0){
 				run=d/2-1;
 				x=(x+1)%n;
 			}
 			else
-				x=(x+(d+3)/2)%n;
+				x=(x+(d+1)/2)%n;
 		}
 	}
 
