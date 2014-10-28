@@ -31,8 +31,8 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	codeAndFill();
 
 	
-/*	MethodsStatic();
-	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
+	MethodsStatic();
+/*	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
 	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
 */	
 	value=NULL;
@@ -165,6 +165,7 @@ void Phi::methodsAndSpace(){
 				pre=value[j];
 				rlg=0;
 				g=0;
+				runs=0;
 				continue;
 			}
 			
