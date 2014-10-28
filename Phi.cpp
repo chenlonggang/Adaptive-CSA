@@ -18,23 +18,12 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	this->b=bs;
 	this->a=18*b;
 	this->index=0;
-	
 	value=phiarray;
-	
 	methodsAndSpace();
 	allocAndInit();
-	
-//	i32 x=0;//methods->GetMemorySize()+offset->GetMemorySize()+samples->GetMemorySize();
-//	x=x+lenofsequence*sizeof(i32)+lenofsuperoffset*sizeof(i32);
-//	cout<<x/(n*1.0)*8<<endl;
-	MethodsStatic();
-
-
 	initTables();
-
 	codeAndFill();
 
-	
 //	MethodsStatic();
 //	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
 //	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
@@ -672,9 +661,10 @@ i32 Phi::rldSequence(i32 position,i32 base,i32 num){
 			if(i+value/2>=num)
 				return (base+num-i)%n;
 			base=(base+value/2)%n;
+			i=i+value/2;
 		}
 		else{
-			base=(base+(value+1)/2)%2;
+			base=(base+(value+1)/2)%n;
 			i++;
 		}
 	}
