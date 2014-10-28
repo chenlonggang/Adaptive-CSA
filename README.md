@@ -120,6 +120,6 @@
 			   time,but for the 1's runs, 1 bit will saved. 
 			   so it will be helpful for highly-repetive data.
 			   working on it now! In fact u8 for lookuptables is enough, fix it
-	2014.10.28:delta coding will be better
+	2014.10.28:delta coding will be better for rl
 
 
