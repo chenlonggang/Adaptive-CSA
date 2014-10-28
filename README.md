@@ -123,5 +123,6 @@
 	2014.10.28:delta coding will be better for run-length.
 	2014.10.28:delta coding is really better than gamma coding for highly-repetive
 	           data, and we use the new maping for real gap and runs.
+	2014.10.28:shrink the lookup-tables may will be helpful to speed.
 
 
