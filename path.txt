@@ -1,1 +1,1 @@
-/home/chen/code/csa/data/kernel.100MB
+/home/chen/code/csa/data/bible

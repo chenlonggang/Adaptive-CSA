@@ -31,7 +31,6 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 
 
 	initTables();
-
 	codeAndFill();
 
 	
@@ -74,9 +73,6 @@ Phi::~Phi(){
 	if(decodevaluenum_rlg) delete [] decodevaluenum_rlg;
 	if(decodebitnum_rlg)   delete [] decodebitnum_rlg;
 	if(decoderesult_rlg)   delete [] decoderesult_rlg;
-	if(decodevaluenum_rld) delete [] decodevaluenum_rld;
-	if(decodebitnum_rld)   delete [] decodebitnum_rld;
-	if(decoderesult_rld)   delete [] decoderesult_rld;
 	
 	samples=offset=NULL;
 	superoffset=NULL;
@@ -84,7 +80,6 @@ Phi::~Phi(){
 	zerostable=NULL;
 	decodevaluenum_gam=decodebitnum_gam=decoderesult_gam=NULL;
 	decodevaluenum_rlg=decodebitnum_rlg=decoderesult_rlg=NULL;
-	decodevaluenum_rld=decodebitnum_rld=decoderesult_rld=NULL;
 
 }
 
@@ -138,12 +133,9 @@ i32 Phi::load(loadkit & s){
 }
 
 i32 Phi::deltasize(i32 v){
-	//i32 x=blogsize(v)-1;
-	//i32 gammasize=2*blogsize(x+1)-1;
-	//return gammasize+x-1;
-	i32  x=blogsize(v);
-	i32 pre=2*blogsize(x)-2;
-	return pre+x-1;
+	i32 x=blogsize(v)-1;
+	i32 gammasize=2*blogsize(x+1)-1;
+	return gammasize+x-1;
 }
 
 
@@ -186,7 +178,6 @@ void Phi::methodsAndSpace(){
 				rlg=0;
 				g=0;
 				rld=0;
-				runs=0;
 				continue;
 			}
 			
@@ -258,11 +249,8 @@ void Phi::initTables(){
 	u16 * Rn_rlg=this->decodevaluenum_rlg;
 	u16 * Rb_rlg=this->decodebitnum_rlg;
 	u16 * Rx_rlg=this->decoderesult_rlg;
-	u16 * Rn_rld=this->decodevaluenum_rld;
-	u16 * Rb_rld=this->decodebitnum_rld;
-	u16 * Rx_rld=this->decoderesult_rld;
 	u32 tablesize=(1<<16);
-	u32 B[4]={0xffffffff,0xffffffff,0xffffffff,0xffffffff};
+	u32 B[3]={0xffffffff,0xffffffff,0xffffffff};
 	u32 *temp=this->sequence;
 	this->sequence=B;
 	i32 b=0;
@@ -272,7 +260,10 @@ void Phi::initTables(){
 	i32 preb=0;
 	for(u32 i=0;i<tablesize;i++){
 		B[0]=(i<<16);
-		b=num=x=d=0;
+		b=0;
+		num=0;
+		x=0;
+		d=0;
 		while(1){
 			this->decodeGamma(b,d);
 			if(b>16)
@@ -285,7 +276,10 @@ void Phi::initTables(){
 		Rn_gam[i]=num;
 		Rx_gam[i]=x;
 		
-		b=d=num=x=0;
+		b=0;
+		d=0;
+		num=0;
+		x=0;
 		preb=0;
 		while(1){
 			this->decodeGamma_rlg(b,d);
@@ -304,27 +298,6 @@ void Phi::initTables(){
 		Rn_rlg[i]=num;
 		Rx_rlg[i]=x;
 		Rb_rlg[i]=preb;
-		
-		b=d=num=x=0;
-		preb=0;
-		while(1){
-			this->decodeDelta_rld2(b,d);
-			if(b>16)
-				break;
-			if(d%2==0){
-				x=x+d/2;
-				num=num+d/2;
-			}
-			else{
-				x=x+(d+1)/2;
-				num++;
-			}
-			preb=b;
-		}
-		Rn_rld[i]=num;
-		Rx_rld[i]=x;
-		Rb_rld[i]=preb;
-//		printf("%x\n",B[0]);
 				
 	}
 	this->sequence=temp;
@@ -344,9 +317,6 @@ void Phi::allocAndInit(){
 	this->decodevaluenum_rlg=new u16[1<<16];
 	this->decodebitnum_rlg=new u16[1<<16];
 	this->decoderesult_rlg=new u16[1<<16];
-	this->decodevaluenum_rld=new u16[1<<16];
-	this->decodebitnum_rld=new u16[1<<16];
-	this->decoderesult_rld=new u16[1<<16];
 	
 	memset(zerostable,0,sizeof(u16)*(1<<16));
 	memset(decodevaluenum_gam,0,sizeof(u16)*(1<<16));
@@ -355,9 +325,6 @@ void Phi::allocAndInit(){
 	memset(decodevaluenum_rlg,0,sizeof(u16)*(1<<16));
 	memset(decodebitnum_rlg,0,sizeof(u16)*(1<<16));
 	memset(decoderesult_rlg,0,sizeof(u16)*(1<<16));
-	memset(decodevaluenum_rld,0,sizeof(u16)*(1<<16));
-	memset(decodebitnum_rld,0,sizeof(u16)*(1<<16));
-	memset(decoderesult_rld,0,sizeof(u16)*(1<<16));
 	memset(superoffset,0,sizeof(i32)*lenofsuperoffset);
 	memset(sequence,0,sizeof(u32)*lenofsequence);
 }
@@ -384,7 +351,7 @@ void Phi::codeAndFill(){
 			index1++;
 			pre=value[i];
 			method=methods->GetValue(i/b);
-			if(method >3 || method <0 )
+			if(method >2 || method <0 )
 				cout<<"fuck "<<method<<" "<<i/b<<endl;
 			runs=0;
 			continue;
@@ -415,24 +382,6 @@ void Phi::codeAndFill(){
 					   runs=0;
 				   };break;
 			case 2:len1=len1+0;break;
-			case 3:
-				   if(gap==1){
-					   runs++;
-				       if((i+1)%b==0){
-						   len1=len1+deltasize(2*runs);
-						   Append_rld(2*runs);
-						   runs=0;
-					   }
-				   }
-				   else{
-					   if(runs!=0){
-						   len1=len1+deltasize(2*runs);
-						   Append_rld(2*runs);
-					   }
-					   len1=len1+deltasize(2*gap-1);
-					   Append_rld(2*gap-1);
-					   runs=0;
-				   };break;
 			default:cerr<<"347: method error"<<endl;exit(0);
 		}
 	}
@@ -466,22 +415,6 @@ void Phi::Append_rlg(i32 x){
 	index=index+valuewidth;
 }
 
-void Phi::Append_rld(i32 x){
-	u64 y=x;
-	i32 size=blogsize(x);
-	Append_rlg(size);
-	i32 valuewidth=size-1;
-	y=(y^(1<<valuewidth));
-
-	i32 anchor=(index>>5);
-	i32 overloop =((anchor+2)<<5)-index-valuewidth;
-	y=(y<<overloop);
-	sequence[anchor]=(sequence[anchor]|(y>>32));
-	sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
-	index=index+valuewidth;
-}
-
-
 i32 Phi::decodeGamma(i32 & position,i32 & value){
 	i32 a=this->zeroRun(position);
 	value=getBits(position,a+1);
@@ -491,32 +424,9 @@ i32 Phi::decodeGamma(i32 & position,i32 & value){
 
 i32 Phi::decodeGamma_rlg(i32 & position,i32 & value){
 	i32 a=this->zeroRun(position);
-	//cout<<a+2<<endl;
 	value=getBits(position,a+2);
 	position=position+a+2;
 	return 2*a+2;
-}
-
-i32 Phi::decodeDelta_rld2(i32 & position,i32 & value){
-	i32 pos=position;
-	decodeGamma_rlg(position,value);
-	i32 v=value;
-	if(value>32){
-		position=(1<<30);
-		return (1<<30);
-	}
-	value=(1<<(v-1))+getBits(position,v-1);
-	position = position+v-1;
-	return position-pos;
-}
-
-i32 Phi::decodeDelta_rld(i32 & position,i32 & value){
-	i32 pos=position;
-	decodeGamma_rlg(position,value);
-	i32 v=value;
-	value=(1<<(v-1))+getBits(position,v-1);
-	position=position+v-1;
-	return position-pos;
 }
 
 i32 Phi::zeroRun(i32 & position){
@@ -535,7 +445,6 @@ i32 Phi::zeroRun(i32 & position){
 }
 
 i32 Phi::getBits(i32 position,i32 num){
-//	cout<<"bits "<<num<<endl;
 	u32 anchor=(position>>5);
 	u64 temp1=sequence[anchor];
 	u32 temp2=sequence[anchor+1];
@@ -587,22 +496,6 @@ i32 * Phi::getPhiArray(){
 				   };
 				   i=i+b-2;
 				   break;
-			case 3:
-				   decodeDelta_rld(position,value);
-				   if(value%2==0){
-					   i32 num=value/2;
-					   for(i32 j=0;j<num;j++){
-						   base=(base+1)%n;
-						   phiarray[i+j]=base;
-					   }
-					   i=i+num-1;
-				   }
-				   else{
-					   value=(value+1)/2;
-					   base=(base+value)%n;
-					   phiarray[i]=base;
-				   };
-				   break;
 			default:cerr<<"method error"<<endl;exit(0);
 		}
 	}
@@ -628,7 +521,6 @@ i32 Phi::getValue(const i32 index){
 		case 0:return gammaSequence(position,base,overloop);
 		case 1:return rlgSequence(position,base,overloop);
 		case 2:return all1Sequence(position,base,overloop);
-		case 3:return rldSequence(position,base,overloop);
 		default:cerr<<"method error"<<endl;exit(0);
 	}
 }
@@ -657,24 +549,6 @@ i32 Phi::rlgSequence(i32 position,i32 base,i32 num){
 		}
 		else{
 			base=(base+(value+1)/2)%n;
-			i++;
-		}
-	}
-	return base;
-}
-
-i32 Phi::rldSequence(i32 position,i32 base,i32 num){
-	i32 i=0;
-	i32 value=0;
-	while(i<num){
-		decodeDelta_rld(position,value);
-		if(value%2==0){
-			if(i+value/2>=num)
-				return (base+num-i)%n;
-			base=(base+value/2)%n;
-		}
-		else{
-			base=(base+(value+1)/2)%2;
 			i++;
 		}
 	}
@@ -715,7 +589,6 @@ i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 		case 0:return leftBoundary_gamma(b,l,r,pl);
 		case 1:return leftBoundary_rlg(b,l,r,pl);
 		case 2:return leftBoundary_all1(b,l,r,pl);
-		case 3:return leftBoundary_rld(b,l,r,pl);
 		default :cerr<<"method erroe"<<endl;exit(0);
 	}
 }
@@ -1108,7 +981,6 @@ i32 Phi::rightBoundary(i32 pr,i32 l,i32 r){
 		case 0:return rightBoundary_gamma(b,l,r,pr);
 		case 1:return rightBoundary_rlg(b,l,r,pr);
 		case 2:return rightBoundary_all1(b,l,r,pr);
-		case 3:return rightBoundary_rld(b,l,r,pr);
 		default:cerr<<"method error"<<endl;exit(0);
 	}
 }
@@ -1427,4 +1299,6 @@ i32 Phi::rightBoundary_all1(i32 b,i32 l,i32 r,i32 pr){
 	return ans;
 
 }
+
+
 

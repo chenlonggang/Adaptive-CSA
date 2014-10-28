@@ -51,6 +51,11 @@ class Phi
 		u16 *decodevaluenum_rlg;
 		u16 *decodebitnum_rlg;
 		u16 *decoderesult_rlg;
+		u16 *decodevaluenum_rld;
+		u16 *decodebitnum_rld;
+		u16 *decoderesult_rld;
+
+
 
 		i32 n;
 		i32 a;
@@ -62,6 +67,7 @@ class Phi
 		//最大的超快的大小
 		i32 maxsbs;
 		i32 blogsize(i32 x);
+		i32 deltasize(i32 x);
 		void initTables();
 
 		/*计算编码方法和总空间
@@ -82,20 +88,26 @@ class Phi
 		i32 decodeGamma(i32 &position,i32 &value);
 		void Append_rlg(i32 x);
 		i32 decodeGamma_rlg(i32 & position,i32 &value);
+		void Append_rld(i32 x);
+		i32 decodeDelta_rld(i32 & position,i32 &value);
+		i32 decodeDelta_rld2(i32 & position,i32 &value);
 
 		i32 zeroRun(i32 &position);
 		i32 getBits(i32 position,i32 bits);
 
 		i32 gammaSequence(i32 position,i32 base,i32 num);
 		i32 rlgSequence(i32 position,i32 base,i32 num);
+		i32 rldSequence(i32 position,i32 base,i32 num);
 		i32 all1Sequence(i32 position,i32 base,i32 num);
 
 		i32 leftBoundary_gamma(i32 b,i32 l,i32 r,i32 pl);
 		i32 leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl);
+		i32 leftBoundary_rld(i32 b,i32 l,i32 r,i32 pl);
 		i32 leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl);
 
 		i32 rightBoundary_gamma(i32 b,i32 l,i32 r,i32 pr);
 		i32 rightBoundary_rlg(i32 b,i32 l,i32 r,i32 pr);
+		i32 rightBoundary_rld(i32 b,i32 l,i32 r,i32 pr);
 		i32 rightBoundary_all1(i32 b,i32 l,i32 r,i32 pr);
 
 		/*以下函数位验证正确性只用。
