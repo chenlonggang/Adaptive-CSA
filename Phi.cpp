@@ -677,6 +677,9 @@ i32 Phi::all1Sequence(i32 position,i32 base,i32 num){
 
 /*在区间[L,R]内，找到第一个Phi值大于等于l的
  */
+/*
+ 一旦找到合法的block,查找的范围位((b-1)*L,b*L]  
+ */
 i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 	i32 L=b;
 	i32 lb=(l+L-1)/L;
@@ -1084,6 +1087,9 @@ i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
 }
 /*在区间[L,R]内，找到最后一个Phi值小于等于l的
  */
+/*
+   查找范围[b*L,(b+1)*L).
+   */
 i32 Phi::rightBoundary(i32 pr,i32 l,i32 r){
 	i32 L=this->b;
 	i32 lb=(l+L-1)/L;
