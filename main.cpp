@@ -33,11 +33,11 @@ int main(int argc, char ** argv){
 
 		//for counting
 		int num=0;
-		int sumnum=0;
+//		int sumnum=0;
 		gettimeofday(&start,NULL);
 		for(int i=0;i<times;i++){
 			csa.counting((const char *)p[i],num);
-			sumnum=sumnum+num;
+//			sumnum=sumnum+num;
 //			cout<<i<<endl;
 		}
 //		cout<<sumnum<<endl;

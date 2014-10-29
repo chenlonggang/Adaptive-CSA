@@ -1052,6 +1052,7 @@ i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
 	ans=r+1;
 	i32 x=samples->GetValue(b-1);
 	m=(b-1)*L;
+/*
 	i32 run=L-1;
 	while(1){
 		if(m>=l && x>=pl){
@@ -1065,6 +1066,19 @@ i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
 			x=(x+1)%n;
 			run--;
 		}
+	}
+*/
+
+	if(l>m){
+		i32 step=l-m;
+		x=(x+l-m+n)%n;
+		m=l;
+		if(pl<=(x+L-1-step+n)%n)
+			ans=m+(pl-x+n)%n;
+	}
+	else{
+		if(pl<=(x+L-1)%n)
+			ans=m+pl-x;
 	}
 	return ans;
 }
@@ -1401,6 +1415,7 @@ i32 Phi::rightBoundary_all1(i32 b,i32 l,i32 r,i32 pr){
 
 	i32 x=samples->GetValue(b);
 	m=b*L;
+/*
 	i32 run=L-1;
 	while(1){
 		if(m>=l && x>pr)
@@ -1414,6 +1429,14 @@ i32 Phi::rightBoundary_all1(i32 b,i32 l,i32 r,i32 pr){
 			run--;
 		}
 	}
+*/
+
+	
+	if(pr<=(x+r-m+n)%n)
+		ans=m+(pr-x)%n;
+	else
+		ans=r;
+
 	return ans;
 
 }
