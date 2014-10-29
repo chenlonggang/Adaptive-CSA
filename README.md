@@ -125,5 +125,5 @@
 	           data, and we use the new maping for real gap and runs.
 	2014.10.28:shrink the lookup-tables may will be helpful to speed.
 	2014.10.29:shrink tables help alittle,for xml file 10000 parten with length 20,
-	           the average count time:45us-->40us.
+	           the average count time:45us-->40us,and fix a bug about shrink.
 

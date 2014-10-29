@@ -33,14 +33,14 @@ int main(int argc, char ** argv){
 
 		//for counting
 		int num=0;
-//		int sumnum=0;
+		int sumnum=0;
 		gettimeofday(&start,NULL);
 		for(int i=0;i<times;i++){
 			csa.counting((const char *)p[i],num);
-//			sumnum=sumnum+num;
+			sumnum=sumnum+num;
 //			cout<<i<<endl;
 		}
-//		cout<<sumnum<<endl;
+		cout<<sumnum<<endl;
 		gettimeofday(&end,NULL);
 		double count_time = (end.tv_sec-start.tv_sec)*1000000.0+end.tv_usec - start.tv_usec;
 		cout<<"	count-time: "<<(count_time)/times<<endl;
@@ -49,6 +49,8 @@ int main(int argc, char ** argv){
 			delete [] p[i];
 		//csa.counting("the",num);
 		//cout<<num<<endl;
+//		csa.counting("AAAAAAAAAAA",num);
+//		cout<<num<<endl;
 	}
 	return 0;
 }

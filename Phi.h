@@ -51,7 +51,7 @@ class Phi
 		u8 *decodevaluenum_rlg;
 		u8 *decodebitnum_rlg;
 		u16 *decoderesult_rlg;
-		u8 *decodevaluenum_rld;
+		u16 *decodevaluenum_rld;
 		u8 *decodebitnum_rld;
 		u16 *decoderesult_rld;
 

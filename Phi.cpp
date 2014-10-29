@@ -75,7 +75,8 @@ Phi::~Phi(){
 	decoderesult_gam=NULL;
 	decodevaluenum_rlg=decodebitnum_rlg=NULL;
 	decoderesult_rlg=NULL;
-	decodevaluenum_rld=decodebitnum_rld=NULL;
+	decodevaluenum_rld=NULL;
+	decodebitnum_rld=NULL;
 	decoderesult_rld=NULL;
 }
 
@@ -249,7 +250,7 @@ void Phi::initTables(){
 	u8 * Rn_rlg=this->decodevaluenum_rlg;
 	u8 * Rb_rlg=this->decodebitnum_rlg;
 	u16 * Rx_rlg=this->decoderesult_rlg;
-	u8 * Rn_rld=this->decodevaluenum_rld;
+	u16 * Rn_rld=this->decodevaluenum_rld;
 	u8 * Rb_rld=this->decodebitnum_rld;
 	u16 * Rx_rld=this->decoderesult_rld;
 	u32 tablesize=(1<<16);
@@ -296,7 +297,7 @@ void Phi::initTables(){
 		Rn_rlg[i]=num;
 		Rx_rlg[i]=x;
 		Rb_rlg[i]=preb;
-//		if(x>255)
+//		if(num>255)
 //			cout<<"rlg "<<x<<endl;
 		
 		b=d=num=x=0;
@@ -318,7 +319,7 @@ void Phi::initTables(){
 		Rn_rld[i]=num;
 		Rx_rld[i]=x;
 		Rb_rld[i]=preb;
-//		if(x>255)
+//		if(num>255)
 //			cout<<"rld "<<x<<endl;
 //		printf("%x\n",B[0]);
 				
@@ -340,7 +341,7 @@ void Phi::allocAndInit(){
 	this->decodevaluenum_rlg=new u8[1<<16];
 	this->decodebitnum_rlg=new u8[1<<16];
 	this->decoderesult_rlg=new u16[1<<16];
-	this->decodevaluenum_rld=new u8[1<<16];
+	this->decodevaluenum_rld=new u16[1<<16];
 	this->decodebitnum_rld=new u8[1<<16];
 	this->decoderesult_rld=new u16[1<<16];
 	
@@ -351,7 +352,7 @@ void Phi::allocAndInit(){
 	memset(decodevaluenum_rlg,0,sizeof(u8)*(1<<16));
 	memset(decodebitnum_rlg,0,sizeof(u8)*(1<<16));
 	memset(decoderesult_rlg,0,sizeof(u16)*(1<<16));
-	memset(decodevaluenum_rld,0,sizeof(u8)*(1<<16));
+	memset(decodevaluenum_rld,0,sizeof(u16)*(1<<16));
 	memset(decodebitnum_rld,0,sizeof(u8)*(1<<16));
 	memset(decoderesult_rld,0,sizeof(u16)*(1<<16));
 	memset(superoffset,0,sizeof(i32)*lenofsuperoffset);
@@ -1079,6 +1080,7 @@ i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
 	}
 */
 
+
 	if(l>m){
 		i32 step=l-m;
 		x=(x+l-m+n)%n;
@@ -1090,6 +1092,7 @@ i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
 		if(pl<=(x+L-1)%n)
 			ans=m+pl-x;
 	}
+
 	return ans;
 }
 /*在区间[L,R]内，找到最后一个Phi值小于等于l的
@@ -1443,7 +1446,6 @@ i32 Phi::rightBoundary_all1(i32 b,i32 l,i32 r,i32 pr){
 		}
 	}
 */
-
 	
 	if(pr<=(x+r-m+n)%n)
 		ans=m+(pr-x)%n;
