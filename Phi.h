@@ -45,14 +45,14 @@ class Phi
 
 		u16 *zerostable;
 		
-		u16 *decodevaluenum_gam;
-		u16 *decodebitnum_gam;
+		u8 *decodevaluenum_gam;
+		u8 *decodebitnum_gam;
 		u16 *decoderesult_gam;
-		u16 *decodevaluenum_rlg;
-		u16 *decodebitnum_rlg;
+		u8 *decodevaluenum_rlg;
+		u8 *decodebitnum_rlg;
 		u16 *decoderesult_rlg;
-		u16 *decodevaluenum_rld;
-		u16 *decodebitnum_rld;
+		u8 *decodevaluenum_rld;
+		u8 *decodebitnum_rld;
 		u16 *decoderesult_rld;
 
 

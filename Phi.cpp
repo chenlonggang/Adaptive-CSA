@@ -23,11 +23,11 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	allocAndInit();
 	initTables();
 	codeAndFill();
-
-//	MethodsStatic();
-//	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
-//	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
-	
+/*
+	MethodsStatic();
+	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
+	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
+*/	
 	value=NULL;
 }
 
@@ -71,10 +71,12 @@ Phi::~Phi(){
 	superoffset=NULL;
 	sequence=NULL;
 	zerostable=NULL;
-	decodevaluenum_gam=decodebitnum_gam=decoderesult_gam=NULL;
-	decodevaluenum_rlg=decodebitnum_rlg=decoderesult_rlg=NULL;
-	decodevaluenum_rld=decodebitnum_rld=decoderesult_rld=NULL;
-
+	decodevaluenum_gam=decodebitnum_gam=NULL;
+	decoderesult_gam=NULL;
+	decodevaluenum_rlg=decodebitnum_rlg=NULL;
+	decoderesult_rlg=NULL;
+	decodevaluenum_rld=decodebitnum_rld=NULL;
+	decoderesult_rld=NULL;
 }
 
 
@@ -241,14 +243,14 @@ void Phi::initTables(){
 			zerostable[j]=D-1-i;
 	}
 	zerostable[0]=D;
-	u16 * Rn_gam=this->decodevaluenum_gam;
-	u16 * Rb_gam=this->decodebitnum_gam;
+	u8 * Rn_gam=this->decodevaluenum_gam;
+	u8 * Rb_gam=this->decodebitnum_gam;
 	u16 * Rx_gam=this->decoderesult_gam;
-	u16 * Rn_rlg=this->decodevaluenum_rlg;
-	u16 * Rb_rlg=this->decodebitnum_rlg;
+	u8 * Rn_rlg=this->decodevaluenum_rlg;
+	u8 * Rb_rlg=this->decodebitnum_rlg;
 	u16 * Rx_rlg=this->decoderesult_rlg;
-	u16 * Rn_rld=this->decodevaluenum_rld;
-	u16 * Rb_rld=this->decodebitnum_rld;
+	u8 * Rn_rld=this->decodevaluenum_rld;
+	u8 * Rb_rld=this->decodebitnum_rld;
 	u16 * Rx_rld=this->decoderesult_rld;
 	u32 tablesize=(1<<16);
 	u32 B[4]={0xffffffff,0xffffffff,0xffffffff,0xffffffff};
@@ -273,7 +275,8 @@ void Phi::initTables(){
 		Rb_gam[i]=preb;
 		Rn_gam[i]=num;
 		Rx_gam[i]=x;
-		
+//		if(x>255)
+//			cout<<"gam "<<x<<endl;
 		b=d=num=x=0;
 		preb=0;
 		while(1){
@@ -293,6 +296,8 @@ void Phi::initTables(){
 		Rn_rlg[i]=num;
 		Rx_rlg[i]=x;
 		Rb_rlg[i]=preb;
+//		if(x>255)
+//			cout<<"rlg "<<x<<endl;
 		
 		b=d=num=x=0;
 		preb=0;
@@ -313,6 +318,8 @@ void Phi::initTables(){
 		Rn_rld[i]=num;
 		Rx_rld[i]=x;
 		Rb_rld[i]=preb;
+//		if(x>255)
+//			cout<<"rld "<<x<<endl;
 //		printf("%x\n",B[0]);
 				
 	}
@@ -327,25 +334,25 @@ void Phi::allocAndInit(){
 	this->sequence=new u32[lenofsequence];
 	
 	this->zerostable = new u16[1<<16];
-	this->decodevaluenum_gam=new u16[1<<16];
-	this->decodebitnum_gam=new u16[1<<16];
+	this->decodevaluenum_gam=new u8[1<<16];
+	this->decodebitnum_gam=new u8[1<<16];
 	this->decoderesult_gam =new u16[1<<16];
-	this->decodevaluenum_rlg=new u16[1<<16];
-	this->decodebitnum_rlg=new u16[1<<16];
+	this->decodevaluenum_rlg=new u8[1<<16];
+	this->decodebitnum_rlg=new u8[1<<16];
 	this->decoderesult_rlg=new u16[1<<16];
-	this->decodevaluenum_rld=new u16[1<<16];
-	this->decodebitnum_rld=new u16[1<<16];
+	this->decodevaluenum_rld=new u8[1<<16];
+	this->decodebitnum_rld=new u8[1<<16];
 	this->decoderesult_rld=new u16[1<<16];
 	
 	memset(zerostable,0,sizeof(u16)*(1<<16));
-	memset(decodevaluenum_gam,0,sizeof(u16)*(1<<16));
-	memset(decodebitnum_gam,0,sizeof(u16)*(1<<16));
+	memset(decodevaluenum_gam,0,sizeof(u8)*(1<<16));
+	memset(decodebitnum_gam,0,sizeof(u8)*(1<<16));
 	memset(decoderesult_gam,0,sizeof(u16)*(1<<16));
-	memset(decodevaluenum_rlg,0,sizeof(u16)*(1<<16));
-	memset(decodebitnum_rlg,0,sizeof(u16)*(1<<16));
+	memset(decodevaluenum_rlg,0,sizeof(u8)*(1<<16));
+	memset(decodebitnum_rlg,0,sizeof(u8)*(1<<16));
 	memset(decoderesult_rlg,0,sizeof(u16)*(1<<16));
-	memset(decodevaluenum_rld,0,sizeof(u16)*(1<<16));
-	memset(decodebitnum_rld,0,sizeof(u16)*(1<<16));
+	memset(decodevaluenum_rld,0,sizeof(u8)*(1<<16));
+	memset(decodebitnum_rld,0,sizeof(u8)*(1<<16));
 	memset(decoderesult_rld,0,sizeof(u16)*(1<<16));
 	memset(superoffset,0,sizeof(i32)*lenofsuperoffset);
 	memset(sequence,0,sizeof(u32)*lenofsequence);
