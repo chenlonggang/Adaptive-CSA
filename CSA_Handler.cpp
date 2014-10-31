@@ -134,7 +134,7 @@ void CSA_Handler::computerPar(i32 * phi){
 	//multi=1;
 	this->L=this->L*multi;
 	this->SL=this->L*18;
-//  cout<<"CSA_Handler--136: multi:  "<<multi<<endl;
+  cout<<"	CSA_Handler--136: multi:  "<<multi<<endl;
 //	this->D=this->D*multi;
 //	this->RD=this->D*16;
 }
