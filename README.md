@@ -122,5 +122,11 @@
 			   working on it now! In fact u8 for lookuptables is enough, fix it
 	2014.10.28: new mapping method helps,but not very much,it seems that for rl,
 	           delta coding will be better
-
+	2014.10.28:delta coding will be better for run-length.
+	2014.10.28:delta coding is really better than gamma coding for highly-repetive
+	           data, and we use the new maping for real gap and runs.
+	2014.10.28:shrink the lookup-tables may will be helpful to speed.
+	2014.10.29:shrink tables help alittle,for xml file 10000 parten with length 20,
+	           the average count time:45us-->40us,and fix a bug about shrink.
+	2014.10.31:refactor, and the Adapative_CSA is closed
 

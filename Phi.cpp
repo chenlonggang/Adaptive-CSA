@@ -18,23 +18,13 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	this->b=bs;
 	this->a=18*b;
 	this->index=0;
-	/*
-	value=new i32[n];
-	memcpy(value,phiarray,n*sizeof(i32));
-	*/
-	
 	value=phiarray;
-	
 	methodsAndSpace();
 	allocAndInit();
 	initTables();
+	initCoders();
 	codeAndFill();
-
-	
-	MethodsStatic();
-/*	cout<<"code is "<<(checkCodeAndFill_getPhiArray()==1?"right":"wrong")<<endl;
-	cout<<"getValue is "<<(checkgetValue()==1?"right":"wrong")<<endl;
-*/	
+//	MethodsStatic();	
 	value=NULL;
 }
 
@@ -49,12 +39,13 @@ bool Phi::checkCodeAndFill_getPhiArray(){
 }
 
 void Phi::MethodsStatic(){
-	i32 x[3]={0,0,0};
+	i32 x[4]={0,0,0};
 	for(i32 i=0;i<n/b;i++)
 		x[methods->GetValue(i)]++;
 	cout<<"gamma: "<<x[0]<<endl;
 	cout<<"rlg:   "<<x[1]<<endl;
 	cout<<"ALL1:  "<<x[2]<<endl;
+	cout<<"rld:   "<<x[3]<<endl;
 }
 
 Phi::~Phi(){
@@ -63,23 +54,17 @@ Phi::~Phi(){
 	if(offset)      delete offset;
 	if(sequence)    delete [] sequence;
 	if(zerostable)  delete [] zerostable;
-	if(decodevaluenum_gam) delete [] decodevaluenum_gam;
-	if(decodebitnum)       delete [] decodebitnum;
-	if(decoderesult_gam)   delete [] decoderesult_gam;
-	if(decodevaluenum_rlg) delete [] decodevaluenum_rlg;
-	if(decoderesult_rlg)   delete [] decoderesult_rlg;
-	
 	samples=offset=NULL;
 	superoffset=NULL;
 	sequence=NULL;
 	zerostable=NULL;
+	delete coder0;
+	delete coder1;
+	delete coder2;
+	delete coder3;
+}
 
-}
-/*
-i32 Phi::getValue(const i32 index){
-	return value[index];
-}
-*/
+
 i32 Phi::write(savekit & s){
 	s.writei32(n);
 	s.writei32(a);
@@ -104,10 +89,6 @@ i32 Phi::load(loadkit & s){
 	s.loadi32(n);
 	s.loadi32(a);
 	s.loadi32(b);
-	//s.loadi32(alphabetsize);
-	//zeroatable
-	this->zerostable=new u16[1<<16];
-	this->initTables();
 	//superoffset
 	s.loadi32(lenofsuperoffset);
 	superoffset=new i32[lenofsuperoffset];
@@ -125,9 +106,29 @@ i32 Phi::load(loadkit & s){
 	//methods
 	methods=new InArray();
 	methods->load(s);
+
+	this->zerostable=new u8[1<<16];
+	this->initTables();
+	this->initCoders();
 	return 0;
 }
 
+void Phi::initCoders(){
+	coder0=new GAM(superoffset,offset,sequence,samples,
+			zerostable,n,a,b,index);
+	coder1=new RLG(superoffset,offset,sequence,samples,
+			zerostable,n,a,b,index);
+	coder2=new ALL1(superoffset,offset,sequence,samples,
+			zerostable,n,a,b,index);
+	coder3=new RLD(superoffset,offset,sequence,samples,
+			zerostable,n,a,b,index);
+}
+
+i32 Phi::deltasize(i32 v){
+	i32  x=blogsize(v);
+	i32 pre=2*blogsize(x)-2;
+	return pre+x-1;
+}
 
 
 i32 Phi::blogsize(i32 x){
@@ -158,6 +159,9 @@ void Phi::methodsAndSpace(){
 	i32 x=n/a;
 	i32 i=0;
 	i32 j=0;
+
+	i32 rld=0;
+	i32 m=0;
 	for(i=0;i<x+1;i++){
 		for(j=i*a;j<(i+1)*a && j<n;j++){
 			
@@ -165,6 +169,7 @@ void Phi::methodsAndSpace(){
 				pre=value[j];
 				rlg=0;
 				g=0;
+				rld=0;
 				runs=0;
 				continue;
 			}
@@ -172,33 +177,46 @@ void Phi::methodsAndSpace(){
 			gap=value[j]-pre;
 			if(gap<0)
 				gap=gap+n;
+			//cout<<gap<<endl;
 			g=g+2*blogsize(gap)-1;
 			if(gap==1)
 				runs++;
 			else{
 				if(runs!=0)
-					rlg=rlg+2*blogsize(2*runs)-1;
-				rlg=rlg+2*blogsize(2*gap-3)-1;
+				{
+					rlg=rlg+2*blogsize(2*runs)-2;
+					rld=rld+deltasize(2*runs);
+				}
+				rlg=rlg+2*blogsize(2*gap-1)-2;
+				rld=rld+deltasize(2*gap-1);
 				runs=0;
 			}
 			pre=value[j];
 			
 			if((j+1)%b==0 || (j+1)==n){
-				if(runs >0)
-					rlg=rlg+2*blogsize(2*runs)-1;
+				if(runs >0){
+					rlg=rlg+2*blogsize(2*runs)-2;
+					rld=rld+deltasize(2*runs);
+				}
 				if(runs==b-1){//ALL1
 					methods->SetValue(j/b,2);
 					len=len+0;
 				}
-				else if(rlg<g){//rlg
-					methods->SetValue(j/b,1);
-					len=len+rlg;
+				else{
+					m=min(g,min(rlg,rld));
+					if(m==g){//gamma
+						methods->SetValue(j/b,0);
+						len=len+g;
+					}
+					else if(m==rlg){//rlg
+						methods->SetValue(j/b,1);
+						len=len+rlg;
+					}
+					else{//rld
+						methods->SetValue(j/b,3);
+						len=len+rld;
+					}
 				}
-				else{//gamma
-					methods->SetValue(j/b,0);
-					len=len+g;
-				}
-
 			}
 		}
 		if(len>maxlen)
@@ -209,6 +227,7 @@ void Phi::methodsAndSpace(){
 	lenofsequence=totlen/32+1;
 	lenofsuperoffset=n/a+1;
 	maxsbs=maxlen;
+//	cout<<maxlen<<endl;
 }
 
 void Phi::initTables(){
@@ -218,55 +237,6 @@ void Phi::initTables(){
 			zerostable[j]=D-1-i;
 	}
 	zerostable[0]=D;
-	u16 * Rn_gam=this->decodevaluenum_gam;
-	u16 * Rb=this->decodebitnum;
-	u16 * Rx_gam=this->decoderesult_gam;
-	u16 * Rn_rlg=this->decodevaluenum_rlg;
-	u16 * Rx_rlg=this->decoderesult_rlg;
-	u32 tablesize=(1<<16);
-	u32 B[3]={0xffffffff,0xffffffff,0xffffffff};
-	u32 *temp=this->sequence;
-	this->sequence=B;
-	i32 b=0;
-	i32 num_gam=0;
-	i32 num_rlg=0;
-	i32 x_gam=0;
-	i32 x_rlg=0;
-	i32 d=0;
-	i32 preb=0;
-	for(u32 i=0;i<tablesize;i++){
-		B[0]=(i<<16);
-		b=0;
-		num_gam=0;
-		num_rlg=0;
-		x_gam=0;
-		x_rlg=0;
-		d=0;
-		while(1){
-			this->decodeGamma(b,d);
-			if(b>16)
-				break;
-			x_gam=x_gam+d;
-			num_gam++;
-			
-			if(d%2==0){
-				x_rlg=x_rlg+d/2;
-				num_rlg=num_rlg+d/2;
-			}
-			else{
-				x_rlg=x_rlg+(d+3)/2;
-				num_rlg++;
-			}
-			preb=b;
-		}
-		Rb[i]=preb;
-		Rn_gam[i]=num_gam;
-		Rx_gam[i]=x_gam;
-		Rn_rlg[i]=num_rlg;
-		Rx_rlg[i]=x_rlg;
-	}
-	this->sequence=temp;
-
 }
 	
 void Phi::allocAndInit(){
@@ -274,20 +244,8 @@ void Phi::allocAndInit(){
 	this->offset=new InArray(n/b+1,blogsize(maxsbs));
 	this->samples=new InArray(n/b+1,blogsize(n));
 	this->sequence=new u32[lenofsequence];
-	
-	this->zerostable = new u16[1<<16];
-	this->decodevaluenum_gam=new u16[1<<16];
-	this->decodebitnum=new u16[1<<16];
-	this->decoderesult_gam =new u16[1<<16];
-	this->decodevaluenum_rlg=new u16[1<<16];
-	this->decoderesult_rlg=new u16[1<<16];
-	
-	memset(zerostable,0,sizeof(u16)*(1<<16));
-	memset(decodevaluenum_gam,0,sizeof(u16)*(1<<16));
-	memset(decodebitnum,0,sizeof(u16)*(1<<16));
-	memset(decoderesult_gam,0,sizeof(u16)*(1<<16));
-	memset(decodevaluenum_rlg,0,sizeof(u16)*(1<<16));
-	memset(decoderesult_rlg,0,sizeof(u16)*(1<<16));
+	this->zerostable = new u8[1<<16];
+	memset(zerostable,0,sizeof(u8)*(1<<16));
 	memset(superoffset,0,sizeof(i32)*lenofsuperoffset);
 	memset(sequence,0,sizeof(u32)*lenofsequence);
 }
@@ -303,6 +261,7 @@ void Phi::codeAndFill(){
 	i32 gap=0;
 	i32 method=0;
 	for(i=0;i<n;i++){
+	//	cout<<index<<endl;
 		if(i%a==0){
 			len2=len1;
 			superoffset[index2]=len2;
@@ -314,7 +273,7 @@ void Phi::codeAndFill(){
 			index1++;
 			pre=value[i];
 			method=methods->GetValue(i/b);
-			if(method >2 || method <0 )
+			if(method >3 || method <0 )
 				cout<<"fuck "<<method<<" "<<i/b<<endl;
 			runs=0;
 			continue;
@@ -325,74 +284,47 @@ void Phi::codeAndFill(){
 		pre=value[i];
 
 		switch(method){
-			case 0:len1=len1+2*blogsize(gap)-1;Append(gap);break;
+			case 0:len1=len1+2*blogsize(gap)-1;coder0->encode(gap);break;
 			case 1:
 				   if(gap==1){
 					   runs++;
-					   if((i+1)%b==0){
-						   len1=len1+2*blogsize(2*runs)-1;
-						   Append(2*runs);
+					   if((i+1)%b==0|| (i+1)==n){
+						   len1=len1+2*blogsize(2*runs)-2;
+						   coder1->encode(2*runs);
 						   runs=0;
 					   }
 				   }
 				   else{
 					   if(runs!=0){
-						   len1=len1+2*blogsize(2*runs)-1;
-						   Append(2*runs);
+						   len1=len1+2*blogsize(2*runs)-2;
+						   coder1->encode(2*runs);
 					   }
-					   len1=len1+2*blogsize(2*gap-3)-1;
-					   Append(2*gap-3);
+					   len1=len1+2*blogsize(2*gap-1)-2;
+					   coder1->encode(2*gap-1);
 					   runs=0;
 				   };break;
 			case 2:len1=len1+0;break;
+			case 3:
+				   if(gap==1){
+					   runs++;
+				       if((i+1)%b==0){
+						   len1=len1+deltasize(2*runs);
+						   coder3->encode(2*runs);
+						   runs=0;
+					   }
+				   }
+				   else{
+					   if(runs!=0){
+						   len1=len1+deltasize(2*runs);
+						   coder3->encode(2*runs);
+					   }
+					   len1=len1+deltasize(2*gap-1);
+					   coder3->encode(2*gap-1);
+					   runs=0;
+				   };break;
 			default:cerr<<"347: method error"<<endl;exit(0);
 		}
 	}
-}
-
-void Phi::Append(i32 x){
-	u64 y=x;
-	i32 zeronums=blogsize(x)-1;
-	index=index+zeronums;
-	i32 valuewidth=zeronums+1;
-
-	i32 anchor=(index>>5);
-	i32 overloop =((anchor+2)<<5)-index-valuewidth;
-	y=(y<<overloop);
-	sequence[anchor]=(sequence[anchor]|(y>>32));
-	sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
-	index=index+valuewidth;
-}
-
-i32 Phi::decodeGamma(i32 & position,i32 & value){
-	i32 a=this->zeroRun(position);
-	value=getBits(position,a+1);
-	position=position+a+1;
-	return 2*a+1;
-}
-
-i32 Phi::zeroRun(i32 & position){
-	i32 y=0;
-	i32 D=16;
-	i32 x=getBits(position,D);
-	i32 w=y=zerostable[x];
-	while(y==D){
-		position=position+D;
-		x=getBits(position,D);
-		y=zerostable[x];
-		w=w+y;
-	}
-	position=position+y;
-	return w;
-}
-
-i32 Phi::getBits(i32 position,i32 num){
-	u32 anchor=(position>>5);
-	u64 temp1=sequence[anchor];
-	u32 temp2=sequence[anchor+1];
-	temp1=(temp1<<32)+temp2;
-	i32 overloop=((anchor+2)<<5)-position-num;
-	return (temp1>>overloop)&((1<<num)-1);
 }
 
 
@@ -405,6 +337,7 @@ i32 * Phi::getPhiArray(){
 	i32 position=0;
 	i32 value=0;
 	for(i=0;i<n;i++){
+	//	cout<<i<<endl;
 		if(i%b==0){
 			base=samples->GetValue(i/b);
 			method=methods->GetValue(i/b);
@@ -412,11 +345,11 @@ i32 * Phi::getPhiArray(){
 			continue;
 		}
 		switch(method){
-			case 0:decodeGamma(position,value);
+			case 0:coder0->decode(position,value);
 				   base=(base+value)%n;
 				   phiarray[i]=base;
 				   break;
-			case 1:decodeGamma(position,value);
+			case 1:coder1->decode(position,value);
 				   if(value%2==0){
 					   i32 num=value/2;
 					   for(i32 j=0;j<num;j++){
@@ -426,7 +359,7 @@ i32 * Phi::getPhiArray(){
 					   i=i+num-1;
 				   }
 				   else{
-					   value=(value+3)/2;
+					   value=(value+1)/2;
 					   base=(base+value)%n;
 					   phiarray[i]=base;;
 				   };
@@ -437,6 +370,22 @@ i32 * Phi::getPhiArray(){
 					   phiarray[i+j]=base;
 				   };
 				   i=i+b-2;
+				   break;
+			case 3:
+				   coder3->decode(position,value);
+				   if(value%2==0){
+					   i32 num=value/2;
+					   for(i32 j=0;j<num;j++){
+						   base=(base+1)%n;
+						   phiarray[i+j]=base;
+					   }
+					   i=i+num-1;
+				   }
+				   else{
+					   value=(value+1)/2;
+					   base=(base+value)%n;
+					   phiarray[i]=base;
+				   };
 				   break;
 			default:cerr<<"method error"<<endl;exit(0);
 		}
@@ -460,48 +409,19 @@ i32 Phi::getValue(const i32 index){
 	i32 position=superoffset[index/a]+offset->GetValue(index/b);
 	i32 method=methods->GetValue(index/b);
 	switch(method){
-		case 0:return gammaSequence(position,base,overloop);
-		case 1:return rlgSequence(position,base,overloop);
-		case 2:return all1Sequence(position,base,overloop);
+		case 0:return coder0->decodeAcc(position,base,overloop);
+		case 1:return coder1->decodeAcc(position,base,overloop);
+		case 2:return coder2->decodeAcc(position,base,overloop);
+		case 3:return coder3->decodeAcc(position,base,overloop);
 		default:cerr<<"method error"<<endl;exit(0);
 	}
 }
 
-i32 Phi::gammaSequence(i32 position,i32 base,i32 num){
-	i32 i=0;
-	i32 value=0;
-	while(i<num){
-		decodeGamma(position,value);
-		base=(base+value)%n;
-		i++;
-	}
-	return base;
-}
-
-i32 Phi::rlgSequence(i32 position,i32 base,i32 num){
-	i32 i=0;
-	i32 value=0;
-	while(i<num){
-		decodeGamma(position,value);
-		if(value%2==0){
-			if(i+value/2>=num)
-				return (base+num-i)%n;
-			base=(base+value/2)%n;
-			i=i+value/2;
-		}
-		else{
-			base=(base+(value+3)/2)%n;
-			i++;
-		}
-	}
-	return base;
-}
-
-i32 Phi::all1Sequence(i32 position,i32 base,i32 num){
-	return (base+num)%n;
-}
 
 /*在区间[L,R]内，找到第一个Phi值大于等于l的
+ */
+/*
+ 一旦找到合法的block,查找的范围位((b-1)*L,b*L]  
  */
 i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 	i32 L=b;
@@ -528,245 +448,20 @@ i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 		return 0;
 	i32 method = methods->GetValue(b-1);
 	switch(method){
-		case 0:return leftBoundary_gamma(b,l,r,pl);
-		case 1:return leftBoundary_rlg(b,l,r,pl);
-		case 2:return leftBoundary_all1(b,l,r,pl);
+		case 0:return coder0->leftBoundary(b,l,r,pl);
+		case 1:return coder1->leftBoundary(b,l,r,pl);
+		case 2:return coder2->leftBoundary(b,l,r,pl);
+		case 3:return coder3->leftBoundary(b,l,r,pl);
 		default :cerr<<"method erroe"<<endl;exit(0);
 	}
 }
 
-i32 Phi::leftBoundary_gamma(i32 b,i32 l,i32 r,i32 pl){
-	i32 ans=0;
-	i32 m=0;
-	i32 SL=a;
-	i32 L=this->b;
-	i32 x=samples->GetValue(b-1);
-	if(r>b*L-1)
-		r=b*L-1;
-	ans=r+1;
-	m=(b-1)*L;
-	i32 position=superoffset[m/SL]+offset->GetValue(b-1);
-	i32 d=0;
-	while(m<l){
-		decodeGamma(position,d);
-		x=(x+d)%n;
-		m++;
-	}
 
-
-/*
-	while(1){
-		if(x>=pl){
-			ans=m;
-			break;
-		}
-		m++;
-		if(m>r)
-			break;
-		decodeGamma(position,d);
-		x=(x+d)%n;
-	}
-*/
-	i32 p=0;
-	i32 num=0;
-	i32 bits=0;
-	bool loop=false;
-	while(x<pl && m<r){
-		loop=true;
-		p=getBits(position,16);
-		num=this->decodevaluenum_gam[p];
-		if(num!=0){
-			m=m+num;
-			position=position+this->decodebitnum[p];
-			x=(x+this->decoderesult_gam[p])%n;
-		}
-		else{
-			m++;
-			bits=this->decodeGamma(position,d);
-			x=x+d;
-		}
-	}
-	if(loop){
-		if(num!=0){
-			x=(x-this->decoderesult_gam[p]+n)%n;
-			position=position-this->decodebitnum[p];
-			m=m-num;
-		}
-		else{
-			m=m-1;
-			x=(x-d+n)%n;
-			position=position-bits;
-		}
-	}
-	while(1){
-		if(x>=pl){
-			ans=m;
-			break;
-		}
-		m++;
-		if(m>r)
-			break;
-		decodeGamma(position,d);
-		x=(x+d)%n;
-	}
-	return ans;
-}
-
-i32 Phi::leftBoundary_rlg(i32 b,i32 l,i32 r,i32 pl){
-	i32 m=0;
-	i32 ans=0;
-	i32 SL=this->a;
-	i32 L=this->b;
-	i32 x=samples->GetValue(b-1);
-	if(r>b*L-1)
-		r=b*L-1;
-	ans=r+1;
-	m=(b-1)*L;
-	i32 position=superoffset[m/SL]+offset->GetValue(b-1);
-	i32 d=0;
-/*
-	i32 run=0;
-	while(1){
-		if(m>=l && x>=pl){
-			ans=m;
-			break;
-		}
-		m++;
-		if(m>r)
-			break;
-		if(run>0){
-			x=(x+1)%n;
-			run--;
-		}
-		else{
-			decodeGamma(position,d);
-			if(d%2==0){
-				run=d/2-1;
-				x=(x+1)%n;
-			}
-			else
-				x=(x+(d+3)/2)%n;
-		}
-	}
-*/
-	
-	while(m<l){
-		this->decodeGamma(position,d);
-		if(d%2==0){
-			if(m+d/2>=l){
-				x=(x+d/2-(m+d/2-l))%n;
-				position=position-(m+d/2-l);
-				m=l;
-				break;
-			}
-			else{
-				x=x+d/2;
-				m=m+d/2;
-			}
-		}
-		else{
-			x=(x+(d+3)/2)%n;
-			m++;
-		}
-	}
-	i32 p=0;
-	i32 num=0;
-	i32 bits=0;
-	bool loop=false;
-	while(x<pl && m<r){
-		loop =true;
-		p=this->getBits(position,16);
-		num=this->decodevaluenum_rlg[p];
-		if(num!=0){
-			m=m+num;
-			position=position+this->decodebitnum[p];
-			x=(x+decoderesult_rlg[p])%n;
-		}
-		else{
-			bits=this->decodeGamma(position,d);
-			if(d%2==0){
-				m=m+d/2;
-				x=x+d/2;
-			}
-			else{
-				m=m+1;
-				x=x+(d+3)/2;
-			}
-		}
-	}
-	if(loop){
-		if(num!=0){
-			x=(n+x-this->decoderesult_rlg[p])%n;
-			position=position-this->decodebitnum[p];
-			m=m-num;
-		}
-		else{
-			if(d%2==0){
-				m=m-d/2;
-				x=(n+x-d/2)%n;
-			}
-			else{
-				m=m-1;
-				x=(n+x-(d+3)/2)%n;
-			}
-			position =position-bits;
-		}
-	}
-
-	i32 run=0;
-	while(1){
-		if(m>=l && x>=pl){
-			ans=m;
-			break;
-		}
-		m++;
-		if(m>r)
-			break;
-		if(run>0){
-			x=(x+1)%n;
-			run--;
-		}
-		else{
-			decodeGamma(position,d);
-			if(d%2==0){
-				run=d/2-1;
-				x=(x+1)%n;
-			}
-			else
-				x=(x+(d+3)/2)%n;
-		}
-	}
-
-	return ans;
-}
-
-i32 Phi::leftBoundary_all1(i32 b,i32 l,i32 r,i32 pl){
-	i32 m=0;
-	i32 ans=0;
-	i32 L=this->b;
-	if(r>b*L-1)
-		r=b*L-1;
-	ans=r+1;
-	i32 x=samples->GetValue(b-1);
-	m=(b-1)*L;
-	i32 run=L-1;
-	while(1){
-		if(m>=l && x>=pl){
-			ans=m;
-			break;
-		}
-		m++;
-		if(m>r)
-			break;
-		if(run>0){
-			x=(x+1)%n;
-			run--;
-		}
-	}
-	return ans;
-}
 /*在区间[L,R]内，找到最后一个Phi值小于等于l的
  */
+/*
+   查找范围[b*L,(b+1)*L).
+   */
 i32 Phi::rightBoundary(i32 pr,i32 l,i32 r){
 	i32 L=this->b;
 	i32 lb=(l+L-1)/L;
@@ -792,221 +487,10 @@ i32 Phi::rightBoundary(i32 pr,i32 l,i32 r){
 		return 0;
 	i32 method=methods->GetValue(b);
 	switch(method){
-		case 0:return rightBoundary_gamma(b,l,r,pr);
-		case 1:return rightBoundary_rlg(b,l,r,pr);
-		case 2:return rightBoundary_all1(b,l,r,pr);
+		case 0:return coder0->rightBoundary(b,l,r,pr);
+		case 1:return coder1->rightBoundary(b,l,r,pr);
+		case 2:return coder2->rightBoundary(b,l,r,pr);
+		case 3:return coder3->rightBoundary(b,l,r,pr);
 		default:cerr<<"method error"<<endl;exit(0);
 	}
 }
-
-i32 Phi::rightBoundary_gamma(i32 b,i32 l,i32 r,i32 pr){
-	i32 m=0;
-	i32 L=this->b;
-	i32 SL=this->a;
-	i32 x=samples->GetValue(b);
-	
-	i32 ans=l-1;
-	
-	if(r>(b+1)*L-1)
-		r=(b+1)*L-1;
-	m=b*L;
-	i32 d=0;
-	i32 position = superoffset[m/SL]+offset->GetValue(m/L);
-	while(m<l){
-		decodeGamma(position,d);
-		x=(x+d)%n;
-		m++;
-	}
-
-/*
-	while(1){
-		if(x>pr)
-			break;
-		ans=m;
-		m++;
-		if(m>r)
-			break;
-		decodeGamma(position,d);
-		x=(x+d)%n;
-	}
-*/
-
-	i32 p=0;
-	i32 num=0;
-	i32 bits=0;
-	bool loop=false;
-	while(x<=pr && m<r){
-		loop=true;
-		p=this->getBits(position,16);
-		num=this->decodevaluenum_gam[p];
-		if(num==0){
-			m++;
-			bits=this->decodeGamma(position,d);
-			x=x+d;
-		}
-		else{
-			m=m+num;
-			position=position+this->decodebitnum[p];
-			x=(x+this->decoderesult_gam[p])%n;
-		}
-	}
-	if(loop){
-		if(num!=0){
-			x=(n+x-this->decoderesult_gam[p])%n;
-			position=position-this->decodebitnum[p];
-			m=m-num;
-		}
-		else{
-			m=m-1;
-			x=(n+x-d)%n;
-			position=position-bits;
-		}
-	}
-	while(1){
-		if(x>pr)
-			break;
-		ans=m;
-		m++;
-		if(m>r)
-			break;
-		decodeGamma(position,d);
-		x=x+d;
-	}
-
-	return ans;
-}
-
-i32 Phi::rightBoundary_rlg(i32 b,i32 l,i32 r,i32 pr){
-	i32 m=0;
-	i32 L=this->b;
-	i32 SL=this->a;
-	i32 x=samples->GetValue(b);
-
-	i32 ans=l-1;
-	if(r>(b+1)*L-1)
-		r=(b+1)*L-1;
-	m=b*L;
-	i32 d=0;
-	i32 position = superoffset[m/SL]+offset->GetValue(m/L);
-/*	
-	i32 run=0;
-	while(1){
-		if(m>=l && x>pr)
-			break;
-		ans=m;
-		m++;
-		if(m>r)
-			break;
-		if(run>0){
-			x=(x+1)%n;
-			run--;
-		}
-		else{
-			decodeGamma(position,d);
-			if(d%2==0){
-				run=d/2-1;
-				x=(x+1)%n;
-			}
-			else
-				x=(x+(d+3)/2)%n;
-		}
-	}
-
-*/
-	i32 p=0;
-	i32 num=0;
-	i32 bits=0;
-	bool loop=false;
-	while(x<=pr && m<r){
-		loop=true;
-		p=this->getBits(position,16);
-		num=this->decodevaluenum_rlg[p];
-		if(num==0){
-			bits=decodeGamma(position,d);
-			if(d%2==0){
-				m=m+d/2;
-				x=(x+d/2)%n;
-			}
-			else{
-				m++;
-				x=(x+(d+3)/2)%n;
-			}
-		}
-		else{
-			m=m+num;
-			position=position+this->decodebitnum[p];
-			x=(x+this->decoderesult_rlg[p])%n;
-		}
-	}
-	if(loop){
-		if(num!=0){
-			x=(n+x-this->decoderesult_rlg[p])%n;
-			position=position-this->decodebitnum[p];
-			m=m-num;
-		}
-		else{
-			if(d%2==0){
-				m=m-d/2;
-				x=(x-d/2+n)%n;
-			}
-			else{
-				m=m-1;
-				x=(n+x-(d+3)/2)%n;
-			}
-			position=position-bits;
-		}
-	}
-	i32 run=0;
-	while(1){
-		if(m>=l && x>pr)
-			break;
-		ans=m;
-		m++;
-		if(m>r)
-			break;
-		if(run>0){
-			x=(x+1)%n;
-			run--;
-		}
-		else{
-			decodeGamma(position,d);
-			if(d%2==0){
-				run=d/2-1;
-				x=(x+1)%n;
-			}
-			else
-				x=(x+(d+3)/2)%n;
-		}
-	}
-
-	return ans;
-}
-
-i32 Phi::rightBoundary_all1(i32 b,i32 l,i32 r,i32 pr){
-	i32 L=this->b;
-	i32 m=0;
-	i32 ans=l-1;
-	if(r>(b+1)*L-1)
-		r=(b+1)*L-1;
-
-	i32 x=samples->GetValue(b);
-	m=b*L;
-	i32 run=L-1;
-	while(1){
-		if(m>=l && x>pr)
-			break;
-		ans=m;
-		m++;
-		if(m>r)
-			break;
-		if(run>0){
-			x=(x+1)%n;
-			run--;
-		}
-	}
-	return ans;
-
-}
-
-
-
