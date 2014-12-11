@@ -21,7 +21,6 @@ GAM::GAM(i32 *superoffset,InArray *offset,u32 *sequence,
 	this->n=n;
 	this->a=a;
 	this->b=b;
-	//this->index=index;
 	initTables();
 }
 
@@ -259,8 +258,6 @@ void GAM::initTables(){
 		Rb[i]=preb;
 		Rn[i]=num;
 		Rx[i]=x;
-//		if(x>255)
-//			cout<<"gam x,num,b "<<x<<" "<<num<<" "<<preb<<endl;
 	}
 	this->sequence=temp;
 }

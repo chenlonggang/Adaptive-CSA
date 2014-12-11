@@ -9,7 +9,7 @@ the Free Software Foundation; either version 2 or later of the License.
 #
 # Description: 
 =============================================*/
-#include"ds_ssort.h"
+#include"divsufsort.h"
 #include"CSA_Handler.h"
 #include<string.h>
 CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u(){
@@ -28,35 +28,24 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u()
 
 	this->alphabetsize=0;
 	uchar * T=NULL;
-	//读取文件
 	T=getFile(sourcefile);
-	//统计，初始化code/incode/start表
 	statics(T);
-	i32 * SA = new i32[n];
-	//计算后缀数组 
-	ds_ssort(T,SA,n);
-	//计算Phi数组
-	i32 * phiarray = phiArray(SA,T);
 	
-	delete [] T;//T is useless now
+	i32 * SA = new i32[n];
+	//ds_ssort(T,SA,n);
+	divsufsort(T,SA,n);
+	i32 * phiarray = phiArray(SA,T);
+	delete [] T;
 	T=NULL;
-	//计算gap中1的比例，依次决定参数 
-	//ratio暂时不决定D和RD，只决定L和SL.
+
 	computerPar(phiarray);
-	//采样SAL和RankL
 	sampleSAAndRank(SA);
-	//from now on ,SA is useless;
 	delete [] SA;
 	SA=NULL;
-	//创建Phi结构。参数：
-	//phiArray:Phi数组
-	//n:Phi数组长度
-	//L:块大小，超快大小固定位块大小的18倍,不用传.
+
 	phi = new Phi(phiarray,n,this->L);
-	
 	delete [] phiarray;
 	phiarray=NULL;
-
 }
 
 CSA_Handler::CSA_Handler(const CSA_Handler & h):u(h.u){
@@ -105,7 +94,6 @@ void CSA_Handler::deletePointers(){
 }
 
 void CSA_Handler::computerPar(i32 * phi){
-	//计算gap中1的比例，依次决定参数 
 	i32 pre=0;
 	i32 gap=0;
 	i32 num=0;
@@ -131,12 +119,9 @@ void CSA_Handler::computerPar(i32 * phi){
 		multi=2;
 	else 
 		multi=4;
-	//multi=1;
 	this->L=this->L*multi;
 	this->SL=this->L*18;
-  cout<<"	CSA_Handler--136: multi:  "<<multi<<endl;
-//	this->D=this->D*multi;
-//	this->RD=this->D*16;
+  	cout<<"	CSA_Handler--136: multi:  "<<multi<<endl;
 }
 
 void CSA_Handler::sampleSAAndRank(i32 * SA){
@@ -155,7 +140,6 @@ void CSA_Handler::sampleSAAndRank(i32 * SA){
 
 
 i32 * CSA_Handler::phiArray(i32 *SA,uchar * T){
-	//计算Phi数组
 	i32 * phi = new i32[n];
 	memset(phi,0,n*sizeof(i32));
 	i32 * temp = new i32[alphabetsize+1];
@@ -181,25 +165,21 @@ i32 * CSA_Handler::phiArray(i32 *SA,uchar * T){
 	return phi;
 }
 
-
-
 uchar * CSA_Handler::getFile(const char * filename){
 	FILE * fp=fopen(filename,"r+");
 	if(fp==NULL){
 		cerr<<"Be sure that file is available"<<endl;
 		exit(0);
 	}
-	// 得到文件大小，最后再把文件指针指向文件开始的地方
 	fseek(fp,0,SEEK_END);
 	this->n=ftell(fp);
 	fseek(fp,0,SEEK_SET);
 
-	i32 overshot =init_ds_ssort(500,2000);
-	uchar * T=new uchar[n+overshot];
-
+	//i32 overshot =init_ds_ssort(500,2000);
+	//uchar * T=new uchar[n+overshot];
+	uchar * T=new uchar[n];
 	i32 e=0;
 	i32 num=0;
-
 	while((e=fread(T+num,sizeof(uchar),n-num,fp))!=0)
 		num=num+e;
 	if(num!=n){
@@ -358,7 +338,6 @@ void CSA_Handler::countSearch2(const char * pattern,i32 &L,i32 &R){
 			Right=0;
 			break;
 		}
-		//cout<<Left<<" "<<Right<<endl;
 	}
 	L=Left;
 	R=Right;
@@ -463,15 +442,13 @@ i32 CSA_Handler::getN(){
 }
 
 i32 CSA_Handler::sizeInByte(){
-	//	return 0;
-	i32 part1=0;//7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
+	i32 part1=7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
 	i32 part2=SAL->GetMemorySize()+RankL->GetMemorySize()+phi->sizeInByte();
 	return part1+part2;
 }
 
 i32 CSA_Handler::sizeInByteForCount(){
-	//return 0;
-	i32 part1=0;//7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
+	i32 part1=7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
 	i32 part2=phi->sizeInByte();
 	return part1+part2;
 }
@@ -495,16 +472,16 @@ i32 CSA_Handler::Save(savekit &s){
 
 	SAL->write(s);
 	RankL->write(s);
-	//code
+
 	s.writei32(256);
 	s.writei32array(code,256);
-	//start
+
 	s.writei32(alphabetsize+1);
 	s.writei32array(start,alphabetsize+1);
-	//incode
+
 	s.writei32(alphabetsize);
 	s.writei32array(incode,alphabetsize);
-	//phi
+
 	phi->write(s);
 	return 0;
 }
@@ -522,20 +499,20 @@ i32 CSA_Handler::Load(loadkit & s){
 
 	RankL=new InArray();
 	RankL->load(s);
-	//code
+	
 	i32 len=0;
 	s.loadi32(len);
 	code=new i32[len];
 	s.loadi32array(code,len);
-	//start
+
 	s.loadi32(len);
 	start=new i32[len];
 	s.loadi32array(start,len);
-	//incode
+
 	s.loadi32(len);
 	incode=new i32[len];
 	s.loadi32array(incode,len);
-
+	
 	phi=new Phi();
 	phi->load(s);
 	return 0;

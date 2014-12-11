@@ -40,7 +40,6 @@ InArray::InArray(i32 data_num, i32 data_width) {
 	}
 }
 
-//数组中下标为index的位置设置值为value
 void InArray::SetValue (i32 index, i32 v){
 
 	if(index>datanum-1|| index<0){
@@ -120,6 +119,4 @@ i32 InArray::load(loadkit & s){
 	mask=((1<<datawidth)-1);
 	return 1;
 }
-
-
 

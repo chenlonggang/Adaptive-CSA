@@ -42,14 +42,12 @@ class CSA_Handler
 		i32 phiList(i32 sa);
 		//得到搜排名位sa的后缀的首字母
 		i32 character(i32 sa);
-
 		//返回SA[sa]
 		i32 lookUp(i32 sa);
 		//Counting的实现，采用直接的二分办法
 		void countSearch(const char * pattern,i32 &L,i32 &R);
 		//Counting的实现，先在采样点上二分，然后在具体的block内二分
 		void countSearch2(const char * pattern,i32 &L,i32 &R);
-
 		//读取文件，初始化各种表。
 		uchar * getFile(const char * filename);
 		void statics(uchar * T);
@@ -62,7 +60,7 @@ class CSA_Handler
 		i32 blog(i32 x);
 		void deletePointers();
 		void assignDataMembers(const CSA_Handler & h);
-		//分别表示:Phi超快的大小，块大小，SA采样补偿，Rank采样步长
+		//分别表示:Phi超快的大小，块大小，SA采样步长，Rank采样步长
 		i32 SL,L,D,RD;
 		//分别表示SA的采样数组和Rank的采样数组
 		InArray * SAL;
@@ -80,7 +78,6 @@ class CSA_Handler
 		uchar lastchar;
 		//Phi结构
 		Phi * phi;
-		
 		i32 speedlevel;
 		//operator=和拷贝构造实现浅拷贝，引用计数在这里实现
 		UseCount u;

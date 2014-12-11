@@ -12,7 +12,6 @@ the Free Software Foundation; either version 2 or later of the License.
 #include"Phi.h"
 #include<iostream>
 using namespace std;
-//#define De
 Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 	this->n=n;
 	this->b=bs;
@@ -173,11 +172,7 @@ void Phi::methodsAndSpace(){
 				runs=0;
 				continue;
 			}
-			
-			gap=value[j]-pre;
-			if(gap<0)
-				gap=gap+n;
-			//cout<<gap<<endl;
+			gap=(value[j]-pre+n)%n;
 			g=g+2*blogsize(gap)-1;
 			if(gap==1)
 				runs++;
@@ -227,7 +222,6 @@ void Phi::methodsAndSpace(){
 	lenofsequence=totlen/32+1;
 	lenofsuperoffset=n/a+1;
 	maxsbs=maxlen;
-//	cout<<maxlen<<endl;
 }
 
 void Phi::initTables(){
@@ -261,7 +255,6 @@ void Phi::codeAndFill(){
 	i32 gap=0;
 	i32 method=0;
 	for(i=0;i<n;i++){
-	//	cout<<index<<endl;
 		if(i%a==0){
 			len2=len1;
 			superoffset[index2]=len2;
@@ -337,7 +330,6 @@ i32 * Phi::getPhiArray(){
 	i32 position=0;
 	i32 value=0;
 	for(i=0;i<n;i++){
-	//	cout<<i<<endl;
 		if(i%b==0){
 			base=samples->GetValue(i/b);
 			method=methods->GetValue(i/b);

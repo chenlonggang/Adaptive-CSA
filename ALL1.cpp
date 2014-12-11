@@ -22,7 +22,6 @@ ALL1::ALL1(i32 *superoffset,InArray *offset,u32 *sequence,
 	this->n=n;
 	this->a=a;
 	this->b=b;
-	//this->index=index;
 }
 
 i32 ALL1::decodeAcc(i32 position,i32 base,i32 num){
