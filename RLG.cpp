@@ -56,6 +56,7 @@ void RLG::appendBinary(u64 y,integer valuewidth){
 		index=index+valuewidth;
 	}
 }
+
 void RLG::encode(integer x){
 	u64 y=x;
 	integer zeronums=blogsize(x)-2;
