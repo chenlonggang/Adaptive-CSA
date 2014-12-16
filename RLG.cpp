@@ -36,11 +36,32 @@ RLG::~RLG(){
 		delete [] decoderesult;
 }
 
+void RLG::appendBinary(u64 y,integer valuewidth){
+	integer anchor_start =(index>>5);
+	integer anchor_end=((index+valuewidth)>>5);
+	if(anchor_end-anchor_start<2){
+		i32 overloop=((anchor_start+2)<<5)-index-valuewidth;
+		y=(y<<overloop);
+		sequence[anchor_start]=(sequence[anchor_start]|(y>>32));
+		sequence[anchor_start+1]=(sequence[anchor_start+1]|(y&0xffffffff));
+		index=index+valuewidth;
+	}
+	else{
+		i32 s1=(anchor_start+1)*32-index;
+		i32 s2=valuewidth-32-s1;
+		sequence[anchor_start]=(sequence[anchor_start]|(y>>(valuewidth-s1)));
+		sequence[anchor_start+1]=(sequence[anchor_start+1]|((y>>s2)&(0xffffffff)));
+		sequence[anchor_start+2]=(sequence[anchor_start+2]|
+								(((((1ULL<<s2)-1)&y)<<(32-s2))&(0xffffffff)));
+		index=index+valuewidth;
+	}
+}
 void RLG::encode(integer x){
 	u64 y=x;
 	integer zeronums=blogsize(x)-2;
 	index=index+zeronums;
 	integer valuewidth=zeronums+2;
+	appendBinary(y,valuewidth);
 /*	
 	integer anchor=(index>>5);
 	integer overloop =((anchor+2)<<5)-index-valuewidth;
@@ -49,6 +70,7 @@ void RLG::encode(integer x){
 	sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
 	index=index+valuewidth;
 */
+	/*
 	integer anchor_start =(index>>5);
 	integer anchor_end=((index+valuewidth)>>5);
 	if(anchor_end-anchor_start<2){
@@ -67,7 +89,7 @@ void RLG::encode(integer x){
 				(((((1ULL<<s2)-1)&y)<<(32-s2))&(0xffffffff)));
 		index=index+valuewidth;
 	}
-
+*/
 }
 
 integer RLG::decode(integer & position,integer &value){

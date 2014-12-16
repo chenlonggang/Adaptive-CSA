@@ -1,1 +1,1 @@
-/home/chen/code/csa/data/english.10MB
+/home/chen/code/csa/data/english.100MB

@@ -24,6 +24,7 @@ class RLG:public Coder{
 		integer leftBoundary(integer b,integer l,integer r,integer pl);
 		integer rightBoundary(integer b,integer l,integer r,integer pr);
 	private:
+		void appendBinary(u64 data,integer valuewidth);
 		integer zeroRun(integer &position);
 		u64 getBits(integer position,integer bits);
 		integer blogsize(integer x);
