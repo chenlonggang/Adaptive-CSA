@@ -23,8 +23,8 @@ class CSA
 		CSA & operator=(const CSA & right){ct=right.ct;return *this;}
 
 		void counting(const char * pattern,i32 &num);
-		void locating(const char * pattern,i32 &num,i32 *&pos);
-		void extracting(i32 start,i32 len,uchar *&sequence);
+		i32 *locating(const char * pattern,i32 &num);
+		uchar * extracting(i32 start,i32 len);
 
 		i32 load(const char * indexfile);
 		i32 save(const char * indexfile);

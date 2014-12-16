@@ -18,7 +18,6 @@ int main(int argc, char ** argv){
 		sources.getline(sourcefile,200);
 		cout<<"file:	"<<sourcefile<<endl;
 		
-		//unsigned char p[times][21]={'\0'};
 		unsigned char * p[times];
 		gettimeofday(&start,NULL);
 		CSA csa(sourcefile);
@@ -28,7 +27,7 @@ int main(int argc, char ** argv){
 		int n= csa.getN();
 		for(int i=0;i<times;i++){
 			int x=rand()%(n-50);
-			csa.extracting(x,20,p[i]);
+			p[i]=csa.extracting(x,20);
 		}
 
 		//for counting
@@ -37,8 +36,7 @@ int main(int argc, char ** argv){
 		gettimeofday(&start,NULL);
 		for(int i=0;i<times;i++){
 			csa.counting((const char *)p[i],num);
-	//		sumnum=sumnum+num;
-//			cout<<i<<endl;
+	//		sumnum=sumnum+nun;
 		}
 	//	cout<<sumnum<<endl;
 		gettimeofday(&end,NULL);
@@ -48,10 +46,6 @@ int main(int argc, char ** argv){
 		cout<<"	come-ratio: "<<csa.sizeInByteForCount()/(n*1.0)<<endl;
 		for(int i=0;i<times;i++)
 			delete [] p[i];
-		//csa.counting("the",num);
-		//cout<<num<<endl;
-//		csa.counting("AAAAAAAAAAA",num);
-//		cout<<num<<endl;
 	}
 	return 0;
 }

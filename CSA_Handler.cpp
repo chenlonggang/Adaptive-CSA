@@ -241,16 +241,17 @@ i32 CSA_Handler::lookUp(i32 i){
 	return (n+SAL->GetValue(i)-step)%n;
 }
 
-void CSA_Handler::Locating(const char * pattern,i32 &num,i32 *&pos){
+i32 * CSA_Handler::Locating(const char * pattern,i32 &num){
 	i32 L=0;
 	i32 R=0;
 	this->countSearch2(pattern,L,R);
 	num=R-L+1;
 	if(L>R)
-		return ;
-	pos=new i32[num];
+		return NULL;
+	i32 *pos=new i32[num];
 	for(i32 i=L;i<=R;i++)
 		pos[i-L]=lookUp(i);
+	return pos;
 }
 
 i32 CSA_Handler::inverse(i32 pos){
@@ -282,13 +283,12 @@ i32 CSA_Handler::character(i32 i){
 	return incode[i];
 }
 
-void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence){
+uchar * CSA_Handler::Extracting(i32 start,i32 len){
 	if(start+len-1>n-1){
 		cerr<<"parmater error: overshot!!!"<<endl;
-		sequence=NULL;
-		exit(0);
+		return NULL;
 	}
-	sequence = new uchar[len+1];
+	uchar *sequence = new uchar[len+1];
 	memset(sequence,0,(len+1)*sizeof(uchar));
 	i32 k=0;
 	start=inverse(start);
@@ -297,6 +297,7 @@ void CSA_Handler::Extracting(i32 start,i32 len,uchar *&sequence){
 		sequence[j]=character(k);
 		start=phi->getValue(start);
 	}
+	return sequence;
 }
 
 void CSA_Handler::countSearch2(const char * pattern,i32 &L,i32 &R){

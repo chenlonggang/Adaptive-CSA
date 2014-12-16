@@ -25,8 +25,8 @@ class CSA_Handler
 		~CSA_Handler();
 
 		void Counting(const char * pattern,i32 &num);
-		void Locating(const char * pattern,i32 &num,i32 *& pos);
-		void Extracting(i32 start,i32 len,uchar *& sequence);
+		i32 * Locating(const char * pattern,i32 &num);
+		uchar * Extracting(i32 start,i32 len);
 
 		i32 Save(savekit & s);
 		i32 Load(loadkit & s);

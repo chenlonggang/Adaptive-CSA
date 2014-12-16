@@ -64,11 +64,11 @@ void CSA::counting(const char * pattern,i32 &num){
 	ct.Counting(pattern,num);
 }
 
-void CSA::locating(const char * pattern,i32  &num,int *&pos){
-	ct.Locating(pattern,num,pos);
+i32 * CSA::locating(const char * pattern,i32  &num){
+	return ct.Locating(pattern,num);
 }
 
-void CSA::extracting(i32 start,i32 len,uchar *&sequence){
-	ct.Extracting(start,len,sequence);
+uchar * CSA::extracting(i32 start,i32 len){
+	return ct.Extracting(start,len);
 }
 
