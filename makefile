@@ -10,7 +10,7 @@ csa.a:savekit.o loadkit.o InArray.o Phi.o Coder.o ALL1.o GAM.o RLG.o RLD.o UseCo
 main.o:main.cpp  CSA.h
 	g++ -c main.cpp 
 clean:
-	rm *.a  *.o ada_csa ./divsufsort/*.a ./divsufsort/*.o
+	rm *.a  *.o ada_csa ./divsufsort/div32/*.a ./divsufsort/div32/*.o
 div:
-	make -C ./divsufsort/;cp divsufsort/libdivsufsort.a .;ar x libdivsufsort.a;rm libdivsufsort.a 
+	make -C ./divsufsort/div32/;cp divsufsort/div32/libdivsufsort.a .;ar x libdivsufsort.a;rm libdivsufsort.a 
 
