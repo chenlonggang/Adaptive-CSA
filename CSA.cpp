@@ -11,23 +11,23 @@ the Free Software Foundation; either version 2 or later of the License.
 =============================================*/
 #include"CSA.h"
 
-CSA::CSA(const char * filename,i32 speedlevel):ct(filename,128,32,speedlevel){}
+CSA::CSA(const char * filename,integer speedlevel):ct(filename,128,32,speedlevel){}
 
 CSA::CSA():ct(){}
 
-i32 CSA::getAlphabetSize(){
+integer CSA::getAlphabetSize(){
 	return ct.getAlphabetSize();
 }
 
-i32 CSA::getN(){
+integer CSA::getN(){
 	return ct.getN();
 }
 
-i32 CSA::sizeInByte(){
+integer CSA::sizeInByte(){
 	return ct.sizeInByte();
 }
 
-i32 CSA::sizeInByteForCount(){
+integer CSA::sizeInByteForCount(){
 	return ct.sizeInByteForCount();
 }
 
@@ -39,7 +39,7 @@ double CSA::compressRatioForCount(){
 	return sizeInByteForCount()/(getN()*1.0);
 }
 
-i32 CSA::save(const char * indexfile){
+integer CSA::save(const char * indexfile){
 	savekit s(indexfile);
 	s.writeu64(198809102510);
 	ct.Save(s);
@@ -47,7 +47,7 @@ i32 CSA::save(const char * indexfile){
 	return 0;
 }
 
-i32 CSA::load(const char * indexfile){
+integer CSA::load(const char * indexfile){
 	loadkit s(indexfile);
 	u64 magicnum=0;
 	s.loadu64(magicnum);
@@ -60,15 +60,15 @@ i32 CSA::load(const char * indexfile){
 	return 0;
 }
 
-void CSA::counting(const char * pattern,i32 &num){
+void CSA::counting(const char * pattern,integer &num){
 	ct.Counting(pattern,num);
 }
 
-i32 * CSA::locating(const char * pattern,i32  &num){
+integer * CSA::locating(const char * pattern,integer  &num){
 	return ct.Locating(pattern,num);
 }
 
-uchar * CSA::extracting(i32 start,i32 len){
+uchar * CSA::extracting(integer start,integer len){
 	return ct.Extracting(start,len);
 }
 

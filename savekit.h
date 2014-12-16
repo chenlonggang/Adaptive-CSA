@@ -1,13 +1,13 @@
 /*============================================
 # Filename: savekit.h
-# Ver 1.0 2014-06-08
+# Ver 1.0 2014-06-09
 # Copyright (C) 2014 ChenLonggang (chenlonggang.love@163.com)
 #
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 or later of the License.
 #
-# Description: A simple tookit for saveing/writing data to file
+# Description: 
 =============================================*/
 #ifndef _SAVEKIT
 #define _SAVEKIT
@@ -20,28 +20,25 @@ using namespace std;
 class savekit
 {
 	public:
+		
 		savekit(const char * file);
 		~savekit();
 
-		i32 writei64(i64 value);
-		i32 writeu64(u64 value);
-		i32 writei32(i32 value);
-	    i32 writeu32(u32 value);
-		i32 writei16(i16 value);
-		i32 writeu16(u16 value);
-		i32 writeu8(u8 value);
+		integer writei64(i64 value);
+		integer writeu64(u64 value);
+		integer writeinteger(integer value);
+	    integer writeu32(u32 value);
+		integer writei16(i16 value);
+		integer writeu16(u16 value);
 
-		i32 writei64array(i64 * value,i32 len);
-		i32 writeu64array(u64 * value,i32 len);
-		i32 writei32array(i32 * value,i32 len);
-		i32 writeu32array(u32 * value,i32 len);
-		i32 writei16array(i16 * value,i32 len);
-		i32 writeu16array(u16 * value,i32 len);
-		i32 writeu8array(u8 * value,i32 len);
+		integer writei64array(i64 * value,integer len);
+		integer writeu64array(u64 * value,integer len);
+		integer writeintegerarray(integer * value,integer len);
+		integer writeu32array(u32 * value,integer len);
+		integer writei16array(i16 * value,integer len);
+		integer writeu16array(u16 * value,integer len);
 	    void close();
-
 	private:
-
 		FILE *w;
 };
 #endif

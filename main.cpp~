@@ -10,8 +10,8 @@ using namespace std;
 int main(int argc, char ** argv){
 	ifstream sources("path.txt");
 	char  sourcefile[100];
-	long filenum=atoi(argv[1]);
-	long currentfile=0;
+	int filenum=atoi(argv[1]);
+	int currentfile=0;
 	struct timeval start;
 	struct timeval end;
 	for(currentfile=0;currentfile < filenum;currentfile++){
@@ -24,17 +24,17 @@ int main(int argc, char ** argv){
 		gettimeofday(&end,NULL);
 		cout<<"	build-time: "<<(end.tv_sec-start.tv_sec)*1000000+end.tv_usec - start.tv_usec<<endl;
 
-		long n= csa.getN();
-		for(long i=0;i<times;i++){
-			long x=rand()%(n-50);
+		int n= csa.getN();
+		for(int i=0;i<times;i++){
+			int x=rand()%(n-50);
 			p[i]=csa.extracting(x,20);
 		}
 
 		//for counting
-		long num=0;
-		long sumnum=0;
+		int num=0;
+		int sumnum=0;
 		gettimeofday(&start,NULL);
-		for(long i=0;i<times;i++){
+		for(int i=0;i<times;i++){
 			csa.counting((const char *)p[i],num);
 	//		sumnum=sumnum+nun;
 		}
@@ -44,7 +44,7 @@ int main(int argc, char ** argv){
 		cout<<"	count-time: "<<(count_time)/times<<endl;
 		
 		cout<<"	come-ratio: "<<csa.sizeInByteForCount()/(n*1.0)<<endl;
-		for(long i=0;i<times;i++)
+		for(int i=0;i<times;i++)
 			delete [] p[i];
 	}
 	return 0;

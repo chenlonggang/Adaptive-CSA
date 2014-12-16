@@ -9,10 +9,10 @@ the Free Software Foundation; either version 2 or later of the License.
 #
 # Description: 
 =============================================*/
-#include"divsufsort.h"
+#include"divsufsort64.h"
 #include"CSA_Handler.h"
 #include<string.h>
-CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u(){
+CSA_Handler::CSA_Handler(const char * sourcefile,integer L,integer D,integer speedlevel):u(){
 	if(speedlevel<0)
 		speedlevel=0;
 	if(speedlevel>2)
@@ -23,18 +23,18 @@ CSA_Handler::CSA_Handler(const char * sourcefile,i32 L,i32 D,i32 speedlevel):u()
 	this->D=D;
 	this->RD=D*16;
 
-	this->code = new i32[256];
-	memset(code,0,256*sizeof(i32));
+	this->code = new integer[256];
+	memset(code,0,256*sizeof(integer));
 
 	this->alphabetsize=0;
 	uchar * T=NULL;
 	T=getFile(sourcefile);
 	statics(T);
 	
-	i32 * SA = new i32[n];
+	integer * SA = new integer[n];
 	//ds_ssort(T,SA,n);
-	divsufsort(T,SA,n);
-	i32 * phiarray = phiArray(SA,T);
+	divsufsort64(T,SA,n);
+	integer * phiarray = phiArray(SA,T);
 	delete [] T;
 	T=NULL;
 
@@ -93,11 +93,11 @@ void CSA_Handler::deletePointers(){
 	code=incode=start=NULL;
 }
 
-void CSA_Handler::computerPar(i32 * phi){
-	i32 pre=0;
-	i32 gap=0;
-	i32 num=0;
-	for(i32 i=0;i<n;i++)
+void CSA_Handler::computerPar(integer * phi){
+	integer pre=0;
+	integer gap=0;
+	integer num=0;
+	for(integer i=0;i<n;i++)
 	{
 		gap=phi[i]-pre;
 		if(gap==1)
@@ -105,7 +105,7 @@ void CSA_Handler::computerPar(i32 * phi){
 		pre=phi[i];
 	}
 	double ratio = (num*1.0)/n;
-	i32 multi=1;
+	integer multi=1;
 	double ratio1=0.0;
 	double ratio2=0.0;
 	switch(speedlevel){
@@ -124,11 +124,11 @@ void CSA_Handler::computerPar(i32 * phi){
   	cout<<"	CSA_Handler--136: multi:  "<<multi<<endl;
 }
 
-void CSA_Handler::sampleSAAndRank(i32 * SA){
-	i32 i=0;
-	i32 j=0;
-	i32 step1=D;
-	i32 step2=RD;
+void CSA_Handler::sampleSAAndRank(integer * SA){
+	integer i=0;
+	integer j=0;
+	integer step1=D;
+	integer step2=RD;
 	SAL = new InArray(n/step1+1,blog(n));
 	RankL=new InArray(n/step2+1,blog(n));
 	for(i=0,j=0;i<n;i=i+step1,j++)
@@ -139,18 +139,18 @@ void CSA_Handler::sampleSAAndRank(i32 * SA){
 }
 
 
-i32 * CSA_Handler::phiArray(i32 *SA,uchar * T){
-	i32 * phi = new i32[n];
-	memset(phi,0,n*sizeof(i32));
-	i32 * temp = new i32[alphabetsize+1];
-	for(i32 i=0;i<alphabetsize+1;i++)
+integer * CSA_Handler::phiArray(integer *SA,uchar * T){
+	integer * phi = new integer[n];
+	memset(phi,0,n*sizeof(integer));
+	integer * temp = new integer[alphabetsize+1];
+	for(integer i=0;i<alphabetsize+1;i++)
 		temp[i]=this->start[i];
-	i32 index = temp[code[lastchar]];
+	integer index = temp[code[lastchar]];
 	temp[code[lastchar]]++;
-	i32 h=0;
+	integer h=0;
 	uchar c=0;
-	i32 pos=0;
-	for(i32 i=0;i<n;i++){
+	integer pos=0;
+	for(integer i=0;i<n;i++){
 		pos=SA[i];
 		if(pos==0){
 			h=i;
@@ -175,11 +175,11 @@ uchar * CSA_Handler::getFile(const char * filename){
 	this->n=ftell(fp);
 	fseek(fp,0,SEEK_SET);
 
-	//i32 overshot =init_ds_ssort(500,2000);
+	//integer overshot =init_ds_ssort(500,2000);
 	//uchar * T=new uchar[n+overshot];
 	uchar * T=new uchar[n];
-	i32 e=0;
-	i32 num=0;
+	integer e=0;
+	integer num=0;
 	while((e=fread(T+num,sizeof(uchar),n-num,fp))!=0)
 		num=num+e;
 	if(num!=n){
@@ -192,28 +192,28 @@ uchar * CSA_Handler::getFile(const char * filename){
 }
 
 void CSA_Handler::statics(uchar *T){
-	for(i32 i=0;i<n;i++)
+	for(integer i=0;i<n;i++)
 		code[T[i]]++;
 
-	for(i32 i=0;i<256;i++)
+	for(integer i=0;i<256;i++)
 		if(code[i]!=0)
 			alphabetsize++;
-	this->start=new i32[alphabetsize+1];
+	this->start=new integer[alphabetsize+1];
 	this->start[alphabetsize]=n;
 	this->start[0]=0;
-	i32 k=1;
-	i32 pre=0;
+	integer k=1;
+	integer pre=0;
 
-	for(i32 i=0;i<256;i++)
+	for(integer i=0;i<256;i++)
 		if(code[i]!=0){
 			start[k]=pre+code[i];
 			pre=start[k];
 			k++;
 		}
 
-	this->incode = new i32[alphabetsize];
+	this->incode = new integer[alphabetsize];
 	k=0;
-	for(i32 i=0;i<256;i++)
+	for(integer i=0;i<256;i++)
 		if(code[i]!=0){
 			code[i]=k;
 			incode[k]=i;
@@ -224,15 +224,15 @@ void CSA_Handler::statics(uchar *T){
 	lastchar=T[n-1];
 }
 
-void CSA_Handler::Counting(const char * pattern,i32 &num){
-	i32 L=0;
-	i32 R=0;
+void CSA_Handler::Counting(const char * pattern,integer &num){
+	integer L=0;
+	integer R=0;
 	countSearch2(pattern,L,R);
 	num=R-L+1;
 }
 
-i32 CSA_Handler::lookUp(i32 i){
-	i32 step=0;
+integer CSA_Handler::lookUp(integer i){
+	integer step=0;
 	while(i%D!=0){
 		i=phi->getValue(i);
 		step++;
@@ -241,23 +241,23 @@ i32 CSA_Handler::lookUp(i32 i){
 	return (n+SAL->GetValue(i)-step)%n;
 }
 
-i32 * CSA_Handler::Locating(const char * pattern,i32 &num){
-	i32 L=0;
-	i32 R=0;
+integer * CSA_Handler::Locating(const char * pattern,integer &num){
+	integer L=0;
+	integer R=0;
 	this->countSearch2(pattern,L,R);
 	num=R-L+1;
 	if(L>R)
 		return NULL;
-	i32 *pos=new i32[num];
-	for(i32 i=L;i<=R;i++)
+	integer *pos=new integer[num];
+	for(integer i=L;i<=R;i++)
 		pos[i-L]=lookUp(i);
 	return pos;
 }
 
-i32 CSA_Handler::inverse(i32 pos){
-	i32 anchor = pos/RD;
-	i32 p=anchor*RD;
-	i32 sa=RankL->GetValue(anchor);
+integer CSA_Handler::inverse(integer pos){
+	integer anchor = pos/RD;
+	integer p=anchor*RD;
+	integer sa=RankL->GetValue(anchor);
 	while(p<pos){
 		sa=phi->getValue(sa);
 		p++;
@@ -265,10 +265,10 @@ i32 CSA_Handler::inverse(i32 pos){
 	return sa;
 }
 
-i32 CSA_Handler::phiList(i32 i){
-	i32 l=0;
-	i32 r=alphabetsize;
-	i32 m=0;
+integer CSA_Handler::phiList(integer i){
+	integer l=0;
+	integer r=alphabetsize;
+	integer m=0;
 	while(l<r){
 		m=(l+r)/2;
 		if(start[m]<=i)
@@ -279,20 +279,20 @@ i32 CSA_Handler::phiList(i32 i){
 	return r-1;
 }
 
-i32 CSA_Handler::character(i32 i){
+integer CSA_Handler::character(integer i){
 	return incode[i];
 }
 
-uchar * CSA_Handler::Extracting(i32 start,i32 len){
+uchar * CSA_Handler::Extracting(integer start,integer len){
 	if(start+len-1>n-1){
 		cerr<<"parmater error: overshot!!!"<<endl;
 		return NULL;
 	}
 	uchar *sequence = new uchar[len+1];
 	memset(sequence,0,(len+1)*sizeof(uchar));
-	i32 k=0;
+	integer k=0;
 	start=inverse(start);
-	for(i32 j=0;j<len;j++){
+	for(integer j=0;j<len;j++){
 		k=phiList(start);
 		sequence[j]=character(k);
 		start=phi->getValue(start);
@@ -300,27 +300,27 @@ uchar * CSA_Handler::Extracting(i32 start,i32 len){
 	return sequence;
 }
 
-void CSA_Handler::countSearch2(const char * pattern,i32 &L,i32 &R){
-	i32 len=strlen(pattern);
+void CSA_Handler::countSearch2(const char * pattern,integer &L,integer &R){
+	integer len=strlen(pattern);
 	if(len==0){
 		L=1;
 		R=0;
 		return;
 	}
 	uchar c=pattern[len-1];
-	i32 coding=code[c];
+	integer coding=code[c];
 	if(coding<0 || coding >alphabetsize-1){
 		L=1;
 		R=0;
 		return ;
 	}
 
-	i32 Left=start[coding];
-	i32 Right=start[coding+1]-1;
-	i32 l0=0;
-	i32 r0=0;
+	integer Left=start[coding];
+	integer Right=start[coding+1]-1;
+	integer l0=0;
+	integer r0=0;
 
-	for(i32 i=len-2;i>=0;i--){
+	for(integer i=len-2;i>=0;i--){
 		c=pattern[i];
 		coding=code[c];
 		if(coding<0){
@@ -345,22 +345,22 @@ void CSA_Handler::countSearch2(const char * pattern,i32 &L,i32 &R){
 	return ;
 }
 
-void CSA_Handler::countSearch(const char * pattern,i32 &L,i32 &R){
-	i32 i;
-	i32 jj;
-	i32 middle;
-	i32 left;
-	i32 right;
-	i32 templeft;
-	i32 tempright;
-	i32 mleft;
-	i32 mright;
-	i32 Left;
-	i32 Right;
+void CSA_Handler::countSearch(const char * pattern,integer &L,integer &R){
+	integer i;
+	integer jj;
+	integer middle;
+	integer left;
+	integer right;
+	integer templeft;
+	integer tempright;
+	integer mleft;
+	integer mright;
+	integer Left;
+	integer Right;
 	
-	i32 len = strlen(pattern);
+	integer len = strlen(pattern);
 	uchar c=pattern[len-1];
-	i32 coding=code[c];
+	integer coding=code[c];
 	if(coding>alphabetsize-1 || coding<0){
 		L=1;
 		R=0;
@@ -434,28 +434,28 @@ void CSA_Handler::countSearch(const char * pattern,i32 &L,i32 &R){
 }
 
 
-i32 CSA_Handler::getAlphabetSize(){
+integer CSA_Handler::getAlphabetSize(){
 	return alphabetsize;
 }
 
-i32 CSA_Handler::getN(){
+integer CSA_Handler::getN(){
 	return n;
 }
 
-i32 CSA_Handler::sizeInByte(){
-	i32 part1=7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
-	i32 part2=SAL->GetMemorySize()+RankL->GetMemorySize()+phi->sizeInByte();
+integer CSA_Handler::sizeInByte(){
+	integer part1=7*sizeof(integer)+1*sizeof(uchar)+256*sizeof(integer)*2+(alphabetsize+1)*sizeof(integer);
+	integer part2=SAL->GetMemorySize()+RankL->GetMemorySize()+phi->sizeInByte();
 	return part1+part2;
 }
 
-i32 CSA_Handler::sizeInByteForCount(){
-	i32 part1=7*sizeof(i32)+1*sizeof(uchar)+256*sizeof(i32)*2+(alphabetsize+1)*sizeof(i32);
-	i32 part2=phi->sizeInByte();
+integer CSA_Handler::sizeInByteForCount(){
+	integer part1=7*sizeof(integer)+1*sizeof(uchar)+256*sizeof(integer)*2+(alphabetsize+1)*sizeof(integer);
+	integer part2=phi->sizeInByte();
 	return part1+part2;
 }
 
-i32 CSA_Handler::blog(i32 x){
-	i32 ans=0;
+integer CSA_Handler::blog(integer x){
+	integer ans=0;
 	while(x>0){
 		ans++;
 		x=(x>>1);
@@ -463,37 +463,37 @@ i32 CSA_Handler::blog(i32 x){
 	return ans;
 }
 
-i32 CSA_Handler::Save(savekit &s){
-	s.writei32(n);
-	s.writei32(alphabetsize);
-	s.writei32(SL);
-	s.writei32(L);
-	s.writei32(D);
-	s.writei32(RD);
+integer CSA_Handler::Save(savekit &s){
+	s.writeinteger(n);
+	s.writeinteger(alphabetsize);
+	s.writeinteger(SL);
+	s.writeinteger(L);
+	s.writeinteger(D);
+	s.writeinteger(RD);
 
 	SAL->write(s);
 	RankL->write(s);
 
-	s.writei32(256);
-	s.writei32array(code,256);
+	s.writeinteger(256);
+	s.writeintegerarray(code,256);
 
-	s.writei32(alphabetsize+1);
-	s.writei32array(start,alphabetsize+1);
+	s.writeinteger(alphabetsize+1);
+	s.writeintegerarray(start,alphabetsize+1);
 
-	s.writei32(alphabetsize);
-	s.writei32array(incode,alphabetsize);
+	s.writeinteger(alphabetsize);
+	s.writeintegerarray(incode,alphabetsize);
 
 	phi->write(s);
 	return 0;
 }
 
-i32 CSA_Handler::Load(loadkit & s){
-	s.loadi32(n);
-	s.loadi32(alphabetsize);
-	s.loadi32(SL);
-	s.loadi32(L);
-	s.loadi32(D);
-	s.loadi32(RD);
+integer CSA_Handler::Load(loadkit & s){
+	s.loadinteger(n);
+	s.loadinteger(alphabetsize);
+	s.loadinteger(SL);
+	s.loadinteger(L);
+	s.loadinteger(D);
+	s.loadinteger(RD);
 	
 	SAL=new InArray();
 	SAL->load(s);
@@ -501,18 +501,18 @@ i32 CSA_Handler::Load(loadkit & s){
 	RankL=new InArray();
 	RankL->load(s);
 	
-	i32 len=0;
-	s.loadi32(len);
-	code=new i32[len];
-	s.loadi32array(code,len);
+	integer len=0;
+	s.loadinteger(len);
+	code=new integer[len];
+	s.loadintegerarray(code,len);
 
-	s.loadi32(len);
-	start=new i32[len];
-	s.loadi32array(start,len);
+	s.loadinteger(len);
+	start=new integer[len];
+	s.loadintegerarray(start,len);
 
-	s.loadi32(len);
-	incode=new i32[len];
-	s.loadi32array(incode,len);
+	s.loadinteger(len);
+	incode=new integer[len];
+	s.loadintegerarray(incode,len);
 	
 	phi=new Phi();
 	phi->load(s);

@@ -12,7 +12,7 @@ the Free Software Foundation; either version 2 or later of the License.
 #include"Phi.h"
 #include<iostream>
 using namespace std;
-Phi::Phi(i32 * phiarray,i32 n,i32 bs){
+Phi::Phi(integer * phiarray,integer n,integer bs){
 	this->n=n;
 	this->b=bs;
 	this->a=18*b;
@@ -28,8 +28,8 @@ Phi::Phi(i32 * phiarray,i32 n,i32 bs){
 }
 
 bool Phi::checkCodeAndFill_getPhiArray(){
-	i32 * array=getPhiArray();
-	for(i32 i=0;i<n;i++)
+	integer * array=getPhiArray();
+	for(integer i=0;i<n;i++)
 		if(value[i]!=array[i]){
 			cout<<value[i]<<" "<<array[i]<<" "<<i<<endl;
 			return false;
@@ -38,8 +38,8 @@ bool Phi::checkCodeAndFill_getPhiArray(){
 }
 
 void Phi::MethodsStatic(){
-	i32 x[4]={0,0,0};
-	for(i32 i=0;i<n/b;i++)
+	integer x[4]={0,0,0};
+	for(integer i=0;i<n/b;i++)
 		x[methods->GetValue(i)]++;
 	cout<<"gamma: "<<x[0]<<endl;
 	cout<<"rlg:   "<<x[1]<<endl;
@@ -64,34 +64,34 @@ Phi::~Phi(){
 }
 
 
-i32 Phi::write(savekit & s){
-	s.writei32(n);
-	s.writei32(a);
-	s.writei32(b);
-	//s.writei32(alphabetsize);
+integer Phi::write(savekit & s){
+	s.writeinteger(n);
+	s.writeinteger(a);
+	s.writeinteger(b);
+	//s.writeinteger(alphabetsize);
 	//superoffset
-	s.writei32(lenofsuperoffset);
-	s.writei32array(superoffset,lenofsuperoffset);
+	s.writeinteger(lenofsuperoffset);
+	s.writeintegerarray(superoffset,lenofsuperoffset);
 	//offset
 	offset->write(s);
 	//samples
 	samples->write(s);
 	//sequence
-	s.writei32(lenofsequence);
+	s.writeinteger(lenofsequence);
 	s.writeu32array(sequence,lenofsequence);
 	//methods
 	methods->write(s);
 	return 0;
 }
 
-i32 Phi::load(loadkit & s){
-	s.loadi32(n);
-	s.loadi32(a);
-	s.loadi32(b);
+integer Phi::load(loadkit & s){
+	s.loadinteger(n);
+	s.loadinteger(a);
+	s.loadinteger(b);
 	//superoffset
-	s.loadi32(lenofsuperoffset);
-	superoffset=new i32[lenofsuperoffset];
-	s.loadi32array(superoffset,lenofsuperoffset);
+	s.loadinteger(lenofsuperoffset);
+	superoffset=new integer[lenofsuperoffset];
+	s.loadintegerarray(superoffset,lenofsuperoffset);
 	//offset
 	offset=new InArray();
 	offset->load(s);
@@ -99,7 +99,7 @@ i32 Phi::load(loadkit & s){
 	samples=new InArray();
 	samples->load(s);
 	//sequence
-	s.loadi32(lenofsequence);
+	s.loadinteger(lenofsequence);
 	sequence = new u32[lenofsequence];
 	s.loadu32array(sequence,lenofsequence);
 	//methods
@@ -123,15 +123,15 @@ void Phi::initCoders(){
 			zerostable,n,a,b,index);
 }
 
-i32 Phi::deltasize(i32 v){
-	i32  x=blogsize(v);
-	i32 pre=2*blogsize(x)-2;
+integer Phi::deltasize(integer v){
+	integer  x=blogsize(v);
+	integer pre=2*blogsize(x)-2;
 	return pre+x-1;
 }
 
 
-i32 Phi::blogsize(i32 x){
-	i32 len=0;
+integer Phi::blogsize(integer x){
+	integer len=0;
 	while(x>0){
 		x=(x>>1);
 		len++;
@@ -139,28 +139,28 @@ i32 Phi::blogsize(i32 x){
 	return len;
 }
 
-i32 Phi::sizeInByte(){
-	i32 part1=methods->GetMemorySize()+offset->GetMemorySize()+samples->GetMemorySize();
-	i32 part2=lenofsuperoffset*sizeof(i32)+lenofsequence*sizeof(u32);
+integer Phi::sizeInByte(){
+	integer part1=methods->GetMemorySize()+offset->GetMemorySize()+samples->GetMemorySize();
+	integer part2=lenofsuperoffset*sizeof(integer)+lenofsequence*sizeof(u32);
 	return part1+part2;
 }
 
 void Phi::methodsAndSpace(){
-	i32 totlen=0;  //总长度 
-	i32 len=0;     //某个超快的编码长度
-	i32 maxlen=0;  //所有超快中编码最长的哪一个
-	i32 runs=0;    //runs长度
-	i32 g=0;       //某块按照gamma编码时的编码长度
-	i32 rlg=0;     //某块按照rl+gamma编码时的编码长度 
-	i32 pre=0;     //pre=value[j-1],即当前值前面的那一个phi值
-	i32 gap=0;     //
+	integer totlen=0;  //总长度 
+	integer len=0;     //某个超快的编码长度
+	integer maxlen=0;  //所有超快中编码最长的哪一个
+	integer runs=0;    //runs长度
+	integer g=0;       //某块按照gamma编码时的编码长度
+	integer rlg=0;     //某块按照rl+gamma编码时的编码长度 
+	integer pre=0;     //pre=value[j-1],即当前值前面的那一个phi值
+	integer gap=0;     //
 	methods = new InArray(n/b+1,2); //每个slot 2bits，可以表示4种编码方法 
-	i32 x=n/a;
-	i32 i=0;
-	i32 j=0;
+	integer x=n/a;
+	integer i=0;
+	integer j=0;
 
-	i32 rld=0;
-	i32 m=0;
+	integer rld=0;
+	integer m=0;
 	for(i=0;i<x+1;i++){
 		for(j=i*a;j<(i+1)*a && j<n;j++){
 			
@@ -225,35 +225,35 @@ void Phi::methodsAndSpace(){
 }
 
 void Phi::initTables(){
-	i32 D=16;
-	for(i32 i=0;i<D;i++){
-		for(i32 j=(1<<i);j<(2<<i);j++)
+	integer D=16;
+	for(integer i=0;i<D;i++){
+		for(integer j=(1<<i);j<(2<<i);j++)
 			zerostable[j]=D-1-i;
 	}
 	zerostable[0]=D;
 }
 	
 void Phi::allocAndInit(){
-	this->superoffset=new i32[lenofsuperoffset];
+	this->superoffset=new integer[lenofsuperoffset];
 	this->offset=new InArray(n/b+1,blogsize(maxsbs));
 	this->samples=new InArray(n/b+1,blogsize(n));
 	this->sequence=new u32[lenofsequence];
 	this->zerostable = new u8[1<<16];
 	memset(zerostable,0,sizeof(u8)*(1<<16));
-	memset(superoffset,0,sizeof(i32)*lenofsuperoffset);
+	memset(superoffset,0,sizeof(integer)*lenofsuperoffset);
 	memset(sequence,0,sizeof(u32)*lenofsequence);
 }
 
 void Phi::codeAndFill(){
-	i32 i=0;
-	i32 len1=0;
-	i32 len2=0;
-	i32 index1=0;
-	i32 index2=0;
-	i32 runs=0;
-	i32 pre=0;
-	i32 gap=0;
-	i32 method=0;
+	integer i=0;
+	integer len1=0;
+	integer len2=0;
+	integer index1=0;
+	integer index2=0;
+	integer runs=0;
+	integer pre=0;
+	integer gap=0;
+	integer method=0;
 	for(i=0;i<n;i++){
 		if(i%a==0){
 			len2=len1;
@@ -321,14 +321,14 @@ void Phi::codeAndFill(){
 }
 
 
-i32 * Phi::getPhiArray(){
-	i32 * phiarray = new i32[n];
-	memset(phiarray,0,sizeof(i32)*n);
-	i32 i=0;
-	i32 method=0;
-	i32 base=0;
-	i32 position=0;
-	i32 value=0;
+integer * Phi::getPhiArray(){
+	integer * phiarray = new integer[n];
+	memset(phiarray,0,sizeof(integer)*n);
+	integer i=0;
+	integer method=0;
+	integer base=0;
+	integer position=0;
+	integer value=0;
 	for(i=0;i<n;i++){
 		if(i%b==0){
 			base=samples->GetValue(i/b);
@@ -343,8 +343,8 @@ i32 * Phi::getPhiArray(){
 				   break;
 			case 1:coder1->decode(position,value);
 				   if(value%2==0){
-					   i32 num=value/2;
-					   for(i32 j=0;j<num;j++){
+					   integer num=value/2;
+					   for(integer j=0;j<num;j++){
 						   base=(base+1)%n;
 						   phiarray[i+j]=base;
 					   }
@@ -356,8 +356,8 @@ i32 * Phi::getPhiArray(){
 					   phiarray[i]=base;;
 				   };
 				   break;
-			case 2://i32 ones=b-1;
-				   for(i32 j=0;j<b-1;j++){
+			case 2://integer ones=b-1;
+				   for(integer j=0;j<b-1;j++){
 					   base=(base+1)%n;
 					   phiarray[i+j]=base;
 				   };
@@ -366,8 +366,8 @@ i32 * Phi::getPhiArray(){
 			case 3:
 				   coder3->decode(position,value);
 				   if(value%2==0){
-					   i32 num=value/2;
-					   for(i32 j=0;j<num;j++){
+					   integer num=value/2;
+					   for(integer j=0;j<num;j++){
 						   base=(base+1)%n;
 						   phiarray[i+j]=base;
 					   }
@@ -395,11 +395,11 @@ bool Phi::checkgetValue(){
 	return true;
 }
 
-i32 Phi::getValue(const i32 index){
-	i32 base=samples->GetValue(index/b);
-	i32 overloop=index%b;
-	i32 position=superoffset[index/a]+offset->GetValue(index/b);
-	i32 method=methods->GetValue(index/b);
+integer Phi::getValue(const integer index){
+	integer base=samples->GetValue(index/b);
+	integer overloop=index%b;
+	integer position=superoffset[index/a]+offset->GetValue(index/b);
+	integer method=methods->GetValue(index/b);
 	switch(method){
 		case 0:return coder0->decodeAcc(position,base,overloop);
 		case 1:return coder1->decodeAcc(position,base,overloop);
@@ -415,13 +415,13 @@ i32 Phi::getValue(const i32 index){
 /*
  一旦找到合法的block,查找的范围位((b-1)*L,b*L]  
  */
-i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
-	i32 L=b;
-	i32 lb=(l+L-1)/L;
-	i32 rb=r/L;
-	i32 b=rb+1;
-	i32 m=0;
-	i32 x=0;
+integer Phi::leftBoundary(integer pl,integer l,integer r){
+	integer L=b;
+	integer lb=(l+L-1)/L;
+	integer rb=r/L;
+	integer b=rb+1;
+	integer m=0;
+	integer x=0;
 	while(lb<=rb){
 		m=(lb+rb)>>1;
 		x=samples->GetValue(m);
@@ -438,7 +438,7 @@ i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 	}
 	if(b==0)
 		return 0;
-	i32 method = methods->GetValue(b-1);
+	integer method = methods->GetValue(b-1);
 	switch(method){
 		case 0:return coder0->leftBoundary(b,l,r,pl);
 		case 1:return coder1->leftBoundary(b,l,r,pl);
@@ -454,13 +454,13 @@ i32 Phi::leftBoundary(i32 pl,i32 l,i32 r){
 /*
    查找范围[b*L,(b+1)*L).
    */
-i32 Phi::rightBoundary(i32 pr,i32 l,i32 r){
-	i32 L=this->b;
-	i32 lb=(l+L-1)/L;
-	i32 rb=r/L;
-	i32 b=lb-1;
-	i32 m=0;
-	i32 x=0;
+integer Phi::rightBoundary(integer pr,integer l,integer r){
+	integer L=this->b;
+	integer lb=(l+L-1)/L;
+	integer rb=r/L;
+	integer b=lb-1;
+	integer m=0;
+	integer x=0;
 	while(lb<=rb){
 		m=(lb+rb)>>1;
 		x=samples->GetValue(m);
@@ -477,7 +477,7 @@ i32 Phi::rightBoundary(i32 pr,i32 l,i32 r){
 	}
 	if(b<0)
 		return 0;
-	i32 method=methods->GetValue(b);
+	integer method=methods->GetValue(b);
 	switch(method){
 		case 0:return coder0->rightBoundary(b,l,r,pr);
 		case 1:return coder1->rightBoundary(b,l,r,pr);

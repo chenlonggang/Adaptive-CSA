@@ -16,23 +16,23 @@ the Free Software Foundation; either version 2 or later of the License.
 class CSA
 {
 	public:
-		CSA(const char * filename,i32 speedlevel=1);
+		CSA(const char * filename,integer speedlevel=1);
 		CSA();
 		~CSA(){};
 		CSA(const CSA & right):ct(right.ct){}
 		CSA & operator=(const CSA & right){ct=right.ct;return *this;}
 
-		void counting(const char * pattern,i32 &num);
-		i32 *locating(const char * pattern,i32 &num);
-		uchar * extracting(i32 start,i32 len);
+		void counting(const char * pattern,integer &num);
+		integer *locating(const char * pattern,integer &num);
+		uchar * extracting(integer start,integer len);
 
-		i32 load(const char * indexfile);
-		i32 save(const char * indexfile);
+		integer load(const char * indexfile);
+		integer save(const char * indexfile);
 
-		i32 getN();
-		i32 getAlphabetSize();
-		i32 sizeInByte();
-		i32 sizeInByteForCount();
+		integer getN();
+		integer getAlphabetSize();
+		integer sizeInByte();
+		integer sizeInByteForCount();
 		double compressRatio();
 		double compressRatioForCount();
 	private:

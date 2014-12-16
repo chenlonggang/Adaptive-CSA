@@ -12,9 +12,9 @@ All of the coded value is gigger 1,so we can cut off the heading 0 of the origin
 delta coding
 =============================================*/
 #include"RLD.h"
-RLD::RLD(i32 *superoffset,InArray *offset,u32 *sequence,
-		InArray *samples,u8 * zerostable,i32 n,i32 a,
-		i32 b,i32 &index):index(index){
+RLD::RLD(integer *superoffset,InArray *offset,u32 *sequence,
+		InArray *samples,u8 * zerostable,integer n,integer a,
+		integer b,integer &index):index(index){
 	this->superoffset=superoffset;
 	this->offset=offset;
 	this->sequence=sequence;
@@ -36,46 +36,46 @@ RLD::~RLD(){
 		delete [] decoderesult;
 }
 
-void RLD::encode(i32 x){
+void RLD::encode(integer x){
 	u64 y=x;
-	i32 size=blogsize(x);
+	integer size=blogsize(x);
 	//Append_rlg(size);
 	{
 		u64 y=size;
-		i32 zeronums=blogsize(size)-2;
+		integer zeronums=blogsize(size)-2;
 		index=index+zeronums;
-		i32 valuewidth=zeronums+2;
-		i32 anchor=(index>>5);
-		i32 overloop =((anchor+2)<<5)-index-valuewidth;
+		integer valuewidth=zeronums+2;
+		integer anchor=(index>>5);
+		integer overloop =((anchor+2)<<5)-index-valuewidth;
 		y=(y<<overloop);
 		sequence[anchor]=(sequence[anchor]|(y>>32));
 		sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
 		index=index+valuewidth;
 	}
-	i32 valuewidth=size-1;
+	integer valuewidth=size-1;
 	y=(y^(1<<valuewidth));
-	i32 anchor=(index>>5);
-	i32 overloop =((anchor+2)<<5)-index-valuewidth;
+	integer anchor=(index>>5);
+	integer overloop =((anchor+2)<<5)-index-valuewidth;
 	y=(y<<overloop);
 	sequence[anchor]=(sequence[anchor]|(y>>32));
 	sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
 	index=index+valuewidth;
 }
 
-i32 RLD::decode(i32 & position,i32 &value){
-	i32 pos=position;
-	i32 x=this->zeroRun(position);
-	i32 v=getBits(position,x+2);
+integer RLD::decode(integer & position,integer &value){
+	integer pos=position;
+	integer x=this->zeroRun(position);
+	integer v=getBits(position,x+2);
 	position=position+x+2;
 	value=(1<<(v-1))+getBits(position,v-1);
 	position=position+v-1;
 	return position-pos;
 }
 
-i32 RLD::decode2(i32 & position,i32 &value){
-	i32 pos=position;
-	i32 x=this->zeroRun(position);
-	i32 v=getBits(position,x+2);
+integer RLD::decode2(integer & position,integer &value){
+	integer pos=position;
+	integer x=this->zeroRun(position);
+	integer v=getBits(position,x+2);
 	position=position+x+2;
 
 	if(v>32){
@@ -87,9 +87,9 @@ i32 RLD::decode2(i32 & position,i32 &value){
 	return position-pos;
 }
 
-i32 RLD::decodeAcc(i32 position,i32 base,i32 num){
-	i32 i=0;
-	i32 value=0;
+integer RLD::decodeAcc(integer position,integer base,integer num){
+	integer i=0;
+	integer value=0;
 	while(i<num){
 		decode(position,value);
 		if(value%2==0){
@@ -106,18 +106,18 @@ i32 RLD::decodeAcc(i32 position,i32 base,i32 num){
 	return base;
 }
 
-i32 RLD::leftBoundary(i32 b,i32 l,i32 r,i32 pl){
-	i32 m=0;
-	i32 ans=0;
-	i32 SL=this->a;
-	i32 L=this->b;
-	i32 x=samples->GetValue(b-1);
+integer RLD::leftBoundary(integer b,integer l,integer r,integer pl){
+	integer m=0;
+	integer ans=0;
+	integer SL=this->a;
+	integer L=this->b;
+	integer x=samples->GetValue(b-1);
 	if(r>b*L-1)
 		r=b*L-1;
 	ans=r+1;
 	m=(b-1)*L;
-	i32 position=superoffset[m/SL]+offset->GetValue(b-1);
-	i32 d=0;
+	integer position=superoffset[m/SL]+offset->GetValue(b-1);
+	integer d=0;
 
 	while(m<l){
 		this->decode(position,d);
@@ -138,9 +138,9 @@ i32 RLD::leftBoundary(i32 b,i32 l,i32 r,i32 pl){
 			m++;
 		}
 	}
-	i32 p=0;
-	i32 num=0;
-	i32 bits=0;
+	integer p=0;
+	integer num=0;
+	integer bits=0;
 	bool loop=false;
 	while(x<pl && m<r){
 		loop =true;
@@ -182,7 +182,7 @@ i32 RLD::leftBoundary(i32 b,i32 l,i32 r,i32 pl){
 		}
 	}
 
-	i32 run=0;
+	integer run=0;
 	while(1){
 		if(m>=l && x>=pl){
 			ans=m;
@@ -209,22 +209,22 @@ i32 RLD::leftBoundary(i32 b,i32 l,i32 r,i32 pl){
 	return ans;
 }
 
-i32 RLD::rightBoundary(i32 b,i32 l,i32 r,i32 pr){
-	i32 m=0;
-	i32 L=this->b;
-	i32 SL=this->a;
-	i32 x=samples->GetValue(b);
+integer RLD::rightBoundary(integer b,integer l,integer r,integer pr){
+	integer m=0;
+	integer L=this->b;
+	integer SL=this->a;
+	integer x=samples->GetValue(b);
 
-	i32 ans=l-1;
+	integer ans=l-1;
 	if(r>(b+1)*L-1)
 		r=(b+1)*L-1;
 	m=b*L;
-	i32 d=0;
-	i32 position = superoffset[m/SL]+offset->GetValue(m/L);
+	integer d=0;
+	integer position = superoffset[m/SL]+offset->GetValue(m/L);
 
-	i32 p=0;
-	i32 num=0;
-	i32 bits=0;
+	integer p=0;
+	integer num=0;
+	integer bits=0;
 	bool loop=false;
 	while(x<=pr && m<r){
 		loop=true;
@@ -265,7 +265,7 @@ i32 RLD::rightBoundary(i32 b,i32 l,i32 r,i32 pr){
 			position=position-bits;
 		}
 	}
-	i32 run=0;
+	integer run=0;
 	while(1){
 		if(m>=l && x>pr)
 			break;
@@ -299,11 +299,11 @@ void RLD::initTables(){
 	u32 B[4]={0xffffffff,0xffffffff,0xffffffff,0xffffffff};
 	u32 *temp=this->sequence;
 	this->sequence=B;
-	i32 b=0;
-	i32 d=0;
-	i32 num=0;
-	i32 preb=0;
-	i32 x=0;
+	integer b=0;
+	integer d=0;
+	integer num=0;
+	integer preb=0;
+	integer x=0;
 	for(u32 i=0;i<tablesize;i++){
 		B[0]=(i<<16);
 		b=num=x=d=0;
@@ -328,17 +328,17 @@ void RLD::initTables(){
 	this->sequence=temp;
 }
 
-i32 RLD::getBits(i32 position,i32 num){
+integer RLD::getBits(integer position,integer num){
 	u32 anchor=(position>>5);
 	u64 temp1=sequence[anchor];
 	u32 temp2=sequence[anchor+1];
 	temp1=(temp1<<32)+temp2;
-	i32 overloop=((anchor+2)<<5)-position-num;
+	integer overloop=((anchor+2)<<5)-position-num;
 	return (temp1>>overloop)&((1<<num)-1);
 }
 
-i32 RLD::blogsize(i32 x){
-	i32 len=0;
+integer RLD::blogsize(integer x){
+	integer len=0;
 	while(x>0){
 		x=(x>>1);
 		len++;
@@ -346,11 +346,11 @@ i32 RLD::blogsize(i32 x){
 	return len;
 }
 
-i32 RLD::zeroRun(i32 & position){
-	i32 y=0;
-	i32 D=16;
-	i32 x=getBits(position,D);
-	i32 w=y=zerostable[x];
+integer RLD::zeroRun(integer & position){
+	integer y=0;
+	integer D=16;
+	integer x=getBits(position,D);
+	integer w=y=zerostable[x];
 	while(y==D){
 		position=position+D;
 		x=getBits(position,D);

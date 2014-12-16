@@ -5,10 +5,10 @@
 class Coder{
 	public:
 		virtual ~Coder(){};
-		virtual void encode(i32 x)=0;
-		virtual i32 decode(i32 &position,i32 &value)=0;
-		virtual i32 decodeAcc(i32 position,i32 base,i32 num)=0;
-		virtual i32 leftBoundary(i32 b,i32 l,i32 r,i32 pl)=0;
-		virtual i32 rightBoundary(i32 b,i32 l,i32 r,i32 pr)=0;
+		virtual void encode(integer x)=0;
+		virtual integer decode(integer &position,integer &value)=0;
+		virtual integer decodeAcc(integer position,integer base,integer num)=0;
+		virtual integer leftBoundary(integer b,integer l,integer r,integer pl)=0;
+		virtual integer rightBoundary(integer b,integer l,integer r,integer pr)=0;
 };
 #endif

@@ -12,19 +12,19 @@
 #include"RLD.h"
 class Phi{
 	public:
-		Phi(i32 * phiarray,i32 n,i32 blocksize);
+		Phi(integer * phiarray,integer n,integer blocksize);
 		Phi(){}
 		~Phi();
-		i32 getValue(const i32 index);
-		i32 * getPhiArray();
-		i32 sizeInByte();
-		i32 leftBoundary(i32 l,i32 r,i32 pl);
-		i32 rightBoundary(i32 l,i32 r,i32 pr);
-		i32 load(loadkit & h);
-		i32 write(savekit &h);
+		integer getValue(const integer index);
+		integer * getPhiArray();
+		integer sizeInByte();
+		integer leftBoundary(integer l,integer r,integer pl);
+		integer rightBoundary(integer l,integer r,integer pr);
+		integer load(loadkit & h);
+		integer write(savekit &h);
 	private:
 		InArray * methods;
-		i32 * superoffset;
+		integer * superoffset;
 		InArray * offset;
 		InArray * samples;
 		u32 * sequence;
@@ -35,17 +35,17 @@ class Phi{
 		ALL1* coder2;
 		RLD * coder3;
 
-		i32 n;
-		i32 a;
-		i32 b;
-		i32 index;
-		i32 *value;
-		i32 lenofsequence;
-		i32 lenofsuperoffset;
-		i32 maxsbs;
+		integer n;
+		integer a;
+		integer b;
+		integer index;
+		integer *value;
+		integer lenofsequence;
+		integer lenofsuperoffset;
+		integer maxsbs;
 		
-		i32 blogsize(i32 x);
-		i32 deltasize(i32 x);
+		integer blogsize(integer x);
+		integer deltasize(integer x);
 		void initTables();
 		void initCoders();
 

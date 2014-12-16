@@ -14,32 +14,32 @@ the Free Software Foundation; either version 2 or later of the License.
 #include"Coder.h"
 class RLD:public Coder{
 	public:
-		RLD(i32 *superoffset,InArray *offset,u32 *sequence,
-				InArray *samples,u8 * zerostable,i32 n,i32 a,
-				i32 b,i32 &index);
+		RLD(integer *superoffset,InArray *offset,u32 *sequence,
+				InArray *samples,u8 * zerostable,integer n,integer a,
+				integer b,integer &index);
 		~RLD();
-		void encode(i32 x);
-		i32 decode(i32 & position,i32 &value);
-		i32 decode2(i32 & position,i32 &value);
-		i32 decodeAcc(i32 position,i32 base,i32 num);
-		i32 leftBoundary(i32 b,i32 l,i32 r,i32 pl);
-		i32 rightBoundary(i32 b,i32 l,i32 r,i32 pr);
+		void encode(integer x);
+		integer decode(integer & position,integer &value);
+		integer decode2(integer & position,integer &value);
+		integer decodeAcc(integer position,integer base,integer num);
+		integer leftBoundary(integer b,integer l,integer r,integer pl);
+		integer rightBoundary(integer b,integer l,integer r,integer pr);
 	private:
-		i32 zeroRun(i32 &position);
-		i32 getBits(i32 position,i32 bits);
-		i32 blogsize(i32 x);
+		integer zeroRun(integer &position);
+		integer getBits(integer position,integer bits);
+		integer blogsize(integer x);
 		void initTables();
 
 
-		i32 * superoffset;
+		integer * superoffset;
 		InArray * offset;
 		u32 * sequence;
 		InArray * samples;
 		u8 * zerostable;
-		i32 n;
-		i32 a;
-		i32 b;
-		i32 & index;
+		integer n;
+		integer a;
+		integer b;
+		integer & index;
 
 		u8 *decodevaluenum;
 		u8 *decodebitnum;
