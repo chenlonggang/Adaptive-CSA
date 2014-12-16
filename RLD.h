@@ -20,13 +20,15 @@ class RLD:public Coder{
 		~RLD();
 		void encode(integer x);
 		integer decode(integer & position,integer &value);
-		integer decode2(integer & position,integer &value);
+		//integer decode2(integer & position,integer &value);
 		integer decodeAcc(integer position,integer base,integer num);
 		integer leftBoundary(integer b,integer l,integer r,integer pl);
 		integer rightBoundary(integer b,integer l,integer r,integer pr);
 	private:
+		integer decode2(integer & position,integer &value);
+		void appendBinary(u64 data,integer valuewidth);
 		integer zeroRun(integer &position);
-		integer getBits(integer position,integer bits);
+		u64 getBits(integer position,integer bits);
 		integer blogsize(integer x);
 		void initTables();
 

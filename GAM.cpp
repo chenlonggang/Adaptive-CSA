@@ -38,13 +38,32 @@ void GAM::encode(integer x){
 	integer zeronums=blogsize(x)-1;
 	index=index+zeronums;
 	integer valuewidth=zeronums+1;
-	
+/*	
 	integer anchor=(index>>5);
 	integer overloop =((anchor+2)<<5)-index-valuewidth;
 	y=(y<<overloop);
 	sequence[anchor]=(sequence[anchor]|(y>>32));
 	sequence[anchor+1]=(sequence[anchor+1]|(y&0xffffffff));
 	index=index+valuewidth;
+*/
+	integer anchor_start =(index>>5);
+	integer anchor_end=((index+valuewidth)>>5);
+	if(anchor_end-anchor_start<2){
+		i32 overloop=((anchor_start+2)<<5)-index-valuewidth;
+		y=(y<<overloop);
+		sequence[anchor_start]=(sequence[anchor_start]|(y>>32));
+		sequence[anchor_start+1]=(sequence[anchor_start+1]|(y&0xffffffff));
+		index=index+valuewidth;
+	}
+	else{
+		i32 s1=(anchor_start+1)*32-index;
+		i32 s2=valuewidth-32-s1;
+		sequence[anchor_start]=(sequence[anchor_start]|(y>>(valuewidth-s1)));
+		sequence[anchor_start+1]=(sequence[anchor_start+1]|((y>>s2)&(0xffffffff)));
+		sequence[anchor_start+2]=(sequence[anchor_start+2]|
+				(((((1ULL<<s2)-1)&y)<<(32-s2))&(0xffffffff)));
+		index=index+valuewidth;
+	}
 }
 
 integer GAM::decode(integer & position,integer &value){
@@ -212,13 +231,31 @@ integer GAM::zeroRun(integer & position){
 	return w;
 }
 
-integer GAM::getBits(integer position,integer num){
-	u32 anchor=(position>>5);
+u64 GAM::getBits(integer position,integer num){
+/*  u32 anchor=(position>>5);
 	u64 temp1=sequence[anchor];
 	u32 temp2=sequence[anchor+1];
 	temp1=(temp1<<32)+temp2;
 	integer overloop=((anchor+2)<<5)-position-num;
 	return (temp1>>overloop)&((1<<num)-1);
+*/
+	integer anchor_start=position>>5;
+	integer anchor_end=(position+num)>>5;
+	if(anchor_end-anchor_start<2){
+		u64 temp1=sequence[anchor_start];
+		u32 temp2=sequence[anchor_start+1];
+		temp1=(temp1<<32)+temp2;
+		integer overloop=((anchor_start+2)<<5)-position-num;
+		return (temp1>>overloop)&((1<<num)-1);
+	}
+	else{
+		u64 temp1=sequence[anchor_start+0];
+		u64 temp2=sequence[anchor_start+1];
+		u64 temp3=sequence[anchor_start+2];
+		i32 s1=(anchor_start+1)*32-index;
+		i32 s2=num-32-s1;
+		return ((temp1<<(32+s2))+(temp2<<s2)+(temp3>>(32-s2)))&((1ULL<<num)-1);
+	}
 }
 
 integer GAM::blogsize(integer x){

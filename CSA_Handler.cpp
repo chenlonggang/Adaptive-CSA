@@ -32,7 +32,6 @@ CSA_Handler::CSA_Handler(const char * sourcefile,integer L,integer D,integer spe
 	statics(T);
 	
 	integer * SA = new integer[n];
-	//ds_ssort(T,SA,n);
 	divsufsort64(T,SA,n);
 	integer * phiarray = phiArray(SA,T);
 	delete [] T;

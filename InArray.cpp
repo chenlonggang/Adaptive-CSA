@@ -152,7 +152,7 @@ integer InArray::GetValue(integer index)
 }
 integer InArray::write(savekit & s)
 {
-	s.writeinteger(datanum);
+	s.writei64(datanum);
 	s.writei64(datawidth);
 	i64 len=(datanum*datawidth);
 	if(len%32==0)
@@ -168,8 +168,8 @@ integer InArray::load(loadkit & s)
 {
 	s.loadi64(datanum);
 	s.loadi64(datawidth);
-	integer len=0;
-	s.loadinteger(len);
+	i64 len=0;
+	s.loadi64(len);
 	data=new u32[len];
 	s.loadu32array(data,len);
 	mask=((1ULL<<datawidth)-1);

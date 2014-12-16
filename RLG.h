@@ -25,7 +25,7 @@ class RLG:public Coder{
 		integer rightBoundary(integer b,integer l,integer r,integer pr);
 	private:
 		integer zeroRun(integer &position);
-		integer getBits(integer position,integer bits);
+		u64 getBits(integer position,integer bits);
 		integer blogsize(integer x);
 		void initTables();
 
