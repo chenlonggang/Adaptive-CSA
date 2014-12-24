@@ -187,29 +187,35 @@ void Phi::methodsAndSpace(){
 				runs=0;
 			}
 			pre=value[j];
-			
-			if((j+1)%b==0 || (j+1)==n){
-				if(runs >0){
-					rlg=rlg+2*blogsize(2*runs)-2;
-					rld=rld+deltasize(2*runs);
-				}
-				if(runs==b-1){//ALL1
-					methods->SetValue(j/b,2);
-					len=len+0;
-				}
-				else{
-					m=min(g,min(rlg,rld));
-					if(m==g){//gamma
-						methods->SetValue(j/b,0);
-						len=len+g;
+		
+			if(j+1==n){//the last block,using gamma-coding
+				methods->SetValue(j/b,0);
+				len=len+g;
+			}
+			else{
+				if((j+1)%b==0 || (j+1)==n){
+					if(runs >0){
+						rlg=rlg+2*blogsize(2*runs)-2;
+						rld=rld+deltasize(2*runs);
 					}
-					else if(m==rlg){//rlg
-						methods->SetValue(j/b,1);
-						len=len+rlg;
+					if(runs==b-1){//ALL1
+						methods->SetValue(j/b,2);
+						len=len+0;
 					}
-					else{//rld
-						methods->SetValue(j/b,3);
-						len=len+rld;
+					else{
+						m=min(g,min(rlg,rld));
+						if(m==g){//gamma
+							methods->SetValue(j/b,0);
+							len=len+g;
+						}
+						else if(m==rlg){//rlg
+							methods->SetValue(j/b,1);
+							len=len+rlg;
+						}
+						else{//rld
+							methods->SetValue(j/b,3);
+							len=len+rld;
+						}
 					}
 				}
 			}
