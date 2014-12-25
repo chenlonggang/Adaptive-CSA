@@ -120,7 +120,7 @@ void CSA_Handler::computerPar(integer * phi){
 		multi=4;
 	this->L=this->L*multi;
 	this->SL=this->L*18;
-  	cout<<"	CSA_Handler--136: multi:  "<<multi<<endl;
+  	//cout<<"	CSA_Handler--136: multi:  "<<multi<<endl;
 }
 
 void CSA_Handler::sampleSAAndRank(integer * SA){
