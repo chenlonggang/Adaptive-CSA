@@ -193,7 +193,7 @@ void Phi::methodsAndSpace(){
 				 len=len+g;
 			}
 			else{
-				if((j+1)%b==0 || (j+1)==n){
+				if((j+1)%b==0){
 					if(runs >0){
 						rlg=rlg+2*blogsize(2*runs)-2;
 						rld=rld+deltasize(2*runs);
