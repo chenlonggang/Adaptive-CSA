@@ -51,9 +51,10 @@ Phi::~Phi(){
 	if(superoffset)	delete [] superoffset;
 	if(samples)     delete samples;
 	if(offset)      delete offset;
+	if(methods)     delete methods;
 	if(sequence)    delete [] sequence;
 	if(zerostable)  delete [] zerostable;
-	samples=offset=NULL;
+	samples=offset=methods=NULL;
 	superoffset=NULL;
 	sequence=NULL;
 	zerostable=NULL;
