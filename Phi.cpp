@@ -225,7 +225,7 @@ void Phi::methodsAndSpace(){
 		totlen=totlen+len;
 		len=0;
 	}
-	lenofsequence=totlen/32+1;
+	lenofsequence=totlen/32+3;
 	lenofsuperoffset=n/a+1;
 	maxsbs=maxlen;
 }
